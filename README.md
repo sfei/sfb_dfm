@@ -23,7 +23,7 @@
     of stompy installed in the same parent directory as the sfb_dfm package
  6) use the SFEI_Wind and SFEI_Meteo packages on SFEI's Google Drive (both are in the 
     1_Nutrient_Share/2_Data_NUTRIENTS folder) to generate wind and meteorological forcing 
-    files. Make sure they are in the UTC time zone. Check the README for directions. Note that 
+    files. Make sure they are in the UTC time zone. Check the README's for directions. Note that 
     you will need a Mac or Linux machine to install the pyngl package that does natural neighbor 
     interpolation, but these scripts should work with linear interpolation on a Windows machine). 
     Upload these files to the run folder (where the *.mdu file is located) and manually edit the 
@@ -45,6 +45,7 @@
          FILETYPE=6
          METHOD=3
          OPERAND=O
+    Also place the meteo_coarse.grd file in the run directory (find in directory SFEI_Meteo/Grid/)
  7) using run_launcher_part_2.sh, call dflowfm to launch the run
     To execute from command line:
         ./run_launcher_part_2.sh

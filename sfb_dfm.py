@@ -23,7 +23,6 @@ import six
 from pathlib import Path
 
 import sys
-sys.path.append(r'/hpcvol1/siennaw/lib/stompy//')
 import stompy.model.delft.io as dio
 from stompy.model.delft import dfm_grid
 from stompy.spatial import wkb2shp
@@ -40,22 +39,27 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
+print('dname = ' + dname)
+
 import sfb_dfm_utils 
 #%% 
 DAY=np.timedelta64(86400,'s') # useful for adjusting times
 
+# get name of run, start time, stop time, and flag to plot boundary conditions (or not) 
+# from environment variables set in run launcher script
+run_name = os.getenv('RUN_NAME')
+run_start = np.datetime64(os.getenv('RUN_START'))
+run_stop = np.datetime64(os.getenv('RUN_STOP'))
+make_plots = bool(os.getenv('MAKE_PLOTS'))
+#run_name="wy2016" 
+#run_start=np.datetime64('2015-08-01')
+#run_stop=np.datetime64('2015-08-02')
+#make_plots = False # True = make plots :) 
 
-run_name="wy2016" 
-run_start=np.datetime64('2015-08-01')
-run_stop=np.datetime64('2015-08-02')
-
-
-make_plots = False # True = make plots :) 
-nprocs = 16
 ALL_FLOWS_UNIT = False # for debug, set all volumetric flow rates to 1m3/s if True
 
-dfm_bin_dir = "/opt/software/delft/dfm/r52184-opt/bin"
-run_folder = Path('/hpcvol1/hpcshared/Hydro_Runs//')        # Where you want your runs to be stored! 
+run_folder = Path(os.path.dirname(dname)) # set run folder to parent directory of sfb_dfm package
+
 ## --------------------------------------------------
 
 # Derived parameters used in multiple places
@@ -66,7 +70,9 @@ runs_dir =  run_folder / 'runs'     # Go to the run folder, check out if a seper
 runs_dir.exists() or runs_dir.mkdir()
 run_base_dir =  runs_dir / run_name  
 run_base_dir.exists() or run_base_dir.mkdir()  # Make sure run directory exists (if not, make it..)
+print('')
 print('YOUR RUN WILL BE FOUND HERE = %s' % run_base_dir)
+print('')
 #%% 
 
 abs_static_dir = base_dir / 'inputs-static' # real location of static directory

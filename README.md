@@ -1,25 +1,33 @@
  Steps for setting up an open bay hydro simulation:
 
- 1) create a folder for the run, e.g. runfolder
- 2) clone sfb_dfm from https://github.com/allietheking/sfb_dfm
+ 1) create a folder for the run, e.g. run_folder located at /run_path/run_folder/
+ 2) clone sfb_dfm from https://stash.sfei.org/scm/nobm/sfb_dfm
+    (old github repo https://github.com/allietheking/sfb_dfm)
     using a recursive clone to include the submodules, e.g. from the 
     command line:
-        cd runfolder
-        git clone --recursive https://github.com/allietheking/sfb_dfm  
+        cd /run_path/run_folder/
+        git clone --recursive  https://stash.sfei.org/scm/nobm/sfb_dfm
  3) clone stompy into the same folder:
+        cd /run_path/run_folder/
         git clone https://github.com/rustychris/stompy
- 4) edit sfb_dfm.py inside the sfb_dfm package to specify run name, start time, and end time
- 5) using run_launcher_part_1.sh in the sfb_dfm package, call sfb_dfm.py to set up the 
-    vast majority of the model input files. The main input file is the *.mdu file, and
-    this points to everything else. To execute from command line:
+ 4) edit run_launcher_part_1.sh inside the sfb_dfm package to specify run name, 
+    start time, end time, and flag whether or not you want the boundary conditions
+    and sources to be plotted
+ 5) run run_launcher_part_1.sh to call sfb_dfm.py which sets up the vast majority of 
+    the model input files. The main input file is the *.mdu file, and this points to 
+    everything else. To execute from command line:
         ./run_launcher_part_1.sh
-    may need to change permissions to execute:
+    you may need to change permissions to execute:
         chmod 777 run_launcher_part_1.sh
+    This script will set your PYTHONPATH environment variable to point to the copy 
+    of stompy installed in the same parent directory as the sfb_dfm package
  6) use the SFEI_Wind and SFEI_Meteo packages on SFEI's Google Drive (both are in the 
     1_Nutrient_Share/2_Data_NUTRIENTS folder) to generate wind and meteorological forcing 
-    files. Make sure they are in the UTC time zone). Upload these files to the run folder 
-    (where the *.mdu file is located) and manually edit the FlowFMold_bnd.ext file, adding 
-    the following lines pointing to the wind and met forcing files:
+    files. Make sure they are in the UTC time zone. Check the README for directions. Note that 
+    you will need a Mac or Linux machine to install the pyngl package that does natural neighbor 
+    interpolation, but these scripts should work with linear interpolation on a Windows machine). 
+    Upload these files to the run folder (where the *.mdu file is located) and manually edit the 
+    FlowFMold_bnd.ext file, adding the following lines pointing to the wind and met forcing files:
          QUANTITY=windx
          FILENAME=wind_x_velocity_filename.amu
          FILETYPE=4
@@ -52,6 +60,7 @@
 * Download a coarse wind field, add as boundary condition.
 * Update settings in template.mdu to customize paths, time information, output selection.
 * Partition the grid and scatter the MDUs.
+* Plots boundary conditions (set make_plots = True in sfb_dfm.py)
 
 ## Files
 

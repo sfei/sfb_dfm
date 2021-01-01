@@ -1,9 +1,9 @@
-[submodule "sfb_dfm_utils"]
-	path = sfb_dfm_utils
-	url = https://github.com/allietheking/sfb_dfm_utils
 [submodule "sfbay_freshwater"]
 	path = sfbay_freshwater
-	url = https://github.com/allietheking/sfbay_freshwater
+	url = https://stash.sfei.org/scm/nobm/sfbay_freshwater.git
 [submodule "sfbay_potw"]
 	path = sfbay_potw
-	url = https://github.com/allietheking/sfbay_potw
+	url = https://stash.sfei.org/scm/nobm/sfbay_potw.git
+[submodule "sfb_dfm_utils"]
+	path = sfb_dfm_utils
+	url = https://stash.sfei.org/scm/nobm/sfb_dfm_utils.git

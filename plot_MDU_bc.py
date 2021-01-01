@@ -21,7 +21,6 @@ abspath = os.path.abspath(__file__)
 dname   = os.path.dirname(abspath)
 os.chdir(dname) # Change working directory to script location
 import sys
-sys.path.append(r'/hpcvol1/siennaw/lib/stompy//')
 from sfb_dfm_utils import plot_mdu 
 
 print('Now making plots...')

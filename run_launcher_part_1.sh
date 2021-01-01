@@ -4,10 +4,10 @@
 # sfb_dfm.py, which creates most of the input files for an open bay DFM run
 
 # User input: 
-export RUN_NAME="test"         # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2015-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2015-08-02"   # run end time in YYYY-MM-DD format
-export MAKE_PLOTS="False"       # flag to make and save plots of boundary conditions
+export RUN_NAME="wy2018"         # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2017-08-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2018-10-01"   # run end time in YYYY-MM-DD format
+export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
 
 # get the parent directory of the sfb_dfm package (assumes this script 
 # is located inside the sfb_dfm package, but script can be run from anywhere)
@@ -23,7 +23,7 @@ echo ""
 # add stompy to pythonpath
 echo "Adding stompy to PYTHONPATH":
 #export PYTHONPATH=$STOMPY_PATH:$PYTHONPATH 
-export PYTHONPATH=$PYTHONPATH    # this overrides paths to pre-existing stompy (safest option)
+export PYTHONPATH=$STOMPY_PATH    # this overrides paths to pre-existing stompy (safest option)
 echo "PYTHONPATH="$PYTHONPATH
 echo ""
 

@@ -7,7 +7,7 @@
 export RUN_NAME="test"         # name of the run (this will be name of *.mdu file and folder it's stored in)
 export RUN_START="2015-08-01"  # run start time in YYYY-MM-DD format
 export RUN_STOP="2015-08-02"   # run end time in YYYY-MM-DD format
-export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
+export MAKE_PLOTS="False"       # flag to make and save plots of boundary conditions
 
 # get the parent directory of the sfb_dfm package (assumes this script 
 # is located inside the sfb_dfm package, but script can be run from anywhere)

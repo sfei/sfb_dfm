@@ -2,41 +2,35 @@
 
 # This script partitions and executes the DFM run
 
-# USER INPUT:
-export MDUNAME="test.mdu"                          # name of *.mdu file
-export RUNPATH="../runs/test/"                     # path to *.mdu file (this is where run will be executed)
-export NPROC=16                                    # number of processors (16 is a good number)
-export DFMV=/opt/software/delft/dfm/r52184-opt/bin # path to DFM binaries
+# User input: 
+RUN_NAME="test"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
+NPROC=16                                    # number of processors (16 is a good number)
+DFMV=/opt/software/delft/dfm/r52184-opt/bin # path to DFM binaries
 
-# ECHO USER INPUT 
-echo "Echo user input"
-echo "  Name of *.mdu file:"
-echo "     MDUNAME="$MDUNAME
-echo "  Path to *.mdu file:"
-echo "     RUNPATH="$RUNPATH
-echo "  Number of processors"
-echo "     NPROC="$NPROC
-echo "  Path to DFM binaries:"
-echo "     DFMV="$DFMV
-echo ""
+# get the parent directory of the sfb_dfm package (assumes this script 
+# is located inside the sfb_dfm package, but script can be run from anywhere)
+SFB_DFM_PARENT_PATH=$(dirname $(dirname $(readlink -f "$0")))
+
+# assumes run directory is in same parent directory as sfb_dfm package
+# (if someone changes this in sfb_dfm.py, this will not be true anymore, so you'll
+# have to point to the new run directory)
+RUN_DIR=$SFB_DFM_PARENT_PATH/runs/$RUN_NAME
 
 # Add DFM to PATH environment variable and check it only points to one version
-export PATH=$DFMV:$PATH
+PATH=$DFMV:$PATH
 echo "Make sure PATH points to only one version of DFM:"
 echo "     PATH="$PATH
 echo ""
 
-# Now navigate to the directory with the *.mdu file
-echo "Changing directories to RUNPATH"
-echo ""
-cd $RUNPATH
 
 # Create partitions for parallel run
-echo "Partitioning into "$NPROC" subdomains, check partition.txt for ouptut"
+echo "Partitioning into "$NPROC" subdomains, check "$RUN_DIR"/partition.txt for ouptut"
 echo ""
-dflowfm --partition:ndomains=$NPROC:icgsolver=6 $MDUNAME >partition.txt
+dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_DIR/$RUN_NAME.mdu >$RUN_DIR/partition.txt
+echo ""
 
 # Execute parallel run
-echo "Executing DFM run, check out.txt and err.txt for output"
+echo "Executing DFM run, check "$RUN_DIR"/out.txt and "$RUN_DIR"/err.txt for output"
 echo ""
-mpiexec -n $NPROC dflowfm --autostartstop $MDUNAME > out.txt 2> err.txt
+mpiexec -n $NPROC dflowfm --autostartstop $RUN_DIR/$RUN_NAME.mdu > $RUN_DIR/out.txt 2> $RUN_DIR/err.txt
+echo ""

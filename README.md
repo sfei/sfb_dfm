@@ -46,6 +46,12 @@
          METHOD=3
          OPERAND=O
     Also place the meteo_coarse.grd file in the run directory (find in directory SFEI_Meteo/Grid/)
+    And finally, in the *.mdu file, in the [physics] section, add the following line:
+        Soiltempthick        = 0.1 
+    and change:
+        Temperature       = 0                  
+    to
+        Temperature 	= 5
  7) using run_launcher_part_2.sh, call dflowfm to launch the run
     To execute from command line:
         ./run_launcher_part_2.sh

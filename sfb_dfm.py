@@ -50,7 +50,16 @@ DAY=np.timedelta64(86400,'s') # useful for adjusting times
 run_name = os.getenv('RUN_NAME')
 run_start = np.datetime64(os.getenv('RUN_START'))
 run_stop = np.datetime64(os.getenv('RUN_STOP'))
-make_plots = bool(os.getenv('MAKE_PLOTS'))
+make_plots_str = os.getenv('MAKE_PLOTS')
+
+# it's kind of involved to interpret True/False strings
+if make_plots_str=='True':
+    make_plots=True
+elif make_plots_str=='False':
+    make_plots=False
+else:
+    raise Exception('MAKE_PLOTS environment variable set in run_launcher_part_1.sh must be "True" or "False"')
+    
 #run_name="wy2016" 
 #run_start=np.datetime64('2015-08-01')
 #run_stop=np.datetime64('2015-08-02')

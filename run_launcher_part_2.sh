@@ -17,20 +17,22 @@ SFB_DFM_PARENT_PATH=$(dirname $(dirname $(readlink -f "$0")))
 RUN_DIR=$SFB_DFM_PARENT_PATH/runs/$RUN_NAME
 
 # Add DFM to PATH environment variable and check it only points to one version
-PATH=$DFMV:$PATH
+export PATH=$DFMV:$PATH
 echo "Make sure PATH points to only one version of DFM:"
 echo "     PATH="$PATH
 echo ""
 
+# change to run directory
+cd $RUN_DIR
 
 # Create partitions for parallel run
-echo "Partitioning into "$NPROC" subdomains, check "$RUN_DIR"/partition.txt for ouptut"
+echo "Partitioning into "$NPROC" subdomains, check "$RUN_DIR"/partition.txt for status"
 echo ""
-dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_DIR/$RUN_NAME.mdu >$RUN_DIR/partition.txt
+dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_NAME.mdu >partition.txt
 echo ""
 
 # Execute parallel run
-echo "Executing DFM run, check "$RUN_DIR"/out.txt and "$RUN_DIR"/err.txt for output"
+echo "Executing DFM run, check "$RUN_DIR"/out.txt and "$RUN_DIR"/err.txt for status"
 echo ""
-mpiexec -n $NPROC dflowfm --autostartstop $RUN_DIR/$RUN_NAME.mdu > $RUN_DIR/out.txt 2> $RUN_DIR/err.txt
+mpiexec -n $NPROC dflowfm --autostartstop $RUN_NAME.mdu > out.txt 2> err.txt
 echo ""

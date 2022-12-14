@@ -3,7 +3,7 @@
 # This script partitions and executes the DFM run
 
 # User input: 
-RUN_NAME="wy2018"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
+RUN_NAME="wy2004"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
 NPROC=16                                    # number of processors (16 is a good number)
 DFMV=/opt/software/delft/dfm/r52184-opt/bin # path to DFM binaries
 

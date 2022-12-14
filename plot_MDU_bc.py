@@ -9,7 +9,7 @@ If you already have an mdu file and don't want to generate again, this is the wa
 """
 
 # MAIN INPUT: the mdu filename     
-mdu_file  = r'/hpcvol1/hpcshared/Hydro_Runs/runs/wy2016/wy2016.mdu' #<<<< input 
+mdu_file  = r'/hpcvol1/hpcshared/Hydro_Runs/wy2018/runs/wy2018/wy2018.mdu' #<<<< input 
             # mdu file name + path
             
 grid_file = r'/hpcvol1/hpcshared/hydro/WY2013/agg141-tau-lp-pass-params/flowgeom.nc' #<<<< input

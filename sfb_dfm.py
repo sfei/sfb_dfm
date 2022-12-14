@@ -42,6 +42,11 @@ os.chdir(dname)
 print('dname = ' + dname)
 
 import sfb_dfm_utils 
+
+# clunky package from allie to set up salinity and temperature initial conditions
+from initial_sal_temp.create_sal_temp_initial_conditions import make_initial_sal_temp
+from initial_sal_temp.create_ROMS_temp_tim import make_ROMS_temp_tim
+
 #%% 
 DAY=np.timedelta64(86400,'s') # useful for adjusting times
 
@@ -88,6 +93,9 @@ abs_static_dir = base_dir / 'inputs-static' # real location of static directory
 rel_static_dir = os.path.relpath(str(abs_static_dir), str(run_base_dir)) # static directory relative to the run directory
 rel_static_dir = Path(rel_static_dir)       # os can read Pathlib objects, so keeping formatting consistent 
 
+# added by allie to accomodate initial salinity
+abs_init_dir = base_dir / 'initial_sal_temp'
+
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
 net_file = base_dir / 'sfei_v20_net.nc' 
@@ -95,6 +103,9 @@ net_file = base_dir / 'sfei_v20_net.nc'
 # No longer using any new-style boundary conditions
 old_bc_fn = run_base_dir / 'FlowFMold_bnd.ext' 
 obs_shp_fn = abs_static_dir / 'observation-points.shp'
+
+# path to grid boundary shapefile
+grid_boundary_fn = base_dir / 'derived' / 'grid-boundary.shp'
 
 dredge_depth = -0.5 # m NAVD88, depth to enforce at inflows and discharges
 
@@ -216,6 +227,12 @@ sfb_dfm_utils.add_delta_inflow(mdu,
 ##
 
 
+# prior to adding the ocean boundary, need to generate the temperature time series
+make_ROMS_temp_tim(abs_init_dir,abs_bc_dir,ref_date,run_start,run_stop)
+
+# also copy the ROMS pli file into the bc directory
+shutil.copyfile(os.path.join(abs_static_dir,'sea_temp_ROMS.pli'), os.path.join(abs_bc_dir,'sea_temp_ROMS.pli'))
+
 # This factor seems to be about right for Point Reyes tides
 # to show up at SF with the right amplitude.  Without
 # attenuation, in runs/w2013b tides at SF are 1.10x observed.
@@ -252,29 +269,22 @@ if 1:  # Copy grid file into run directory and update mdu
     # write out the modified grid
     dfm_grid.write_dfm(grid, str(dest) , overwrite=True)
 
+# prior to adding initial salinity to the external forcing, we have to generate it!!!
+make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir)
+
 
 # update to work with rusty's changes to sfb_dfm_utils
 #sfb_dfm_utils.add_initial_salinity_dyn(run_base_dir,
 #                                       abs_static_dir,
 #                                       mdu,
 #                                       run_start)
+# altered by Allie to use updated initial salinity and also temperature!!!
 sfb_dfm_utils.add_initial_salinity(str(run_base_dir),
-                                   str(abs_static_dir),
+                                   #str(abs_static_dir), # removed by allie
+                                   str(abs_bc_dir), # replaced by allie
                                    str(old_bc_fn),
                                    all_flows_unit = ALL_FLOWS_UNIT)
 
-
-# WIND
-#ludwig_ok=sfb_dfm_utils.add_erddap_ludwig_wind(run_base_dir,
-#                                               run_start,run_stop,
-#                                               old_bc_fn)
-#if not ludwig_ok:
-#    const_ok=sfb_dfm_utils.add_constant_wind(run_base_dir,mdu,[0,0],run_start,run_stop)
-#    assert const_ok
-#else:
-#    assert ludwig_ok # or see lsb_dfm.py for constant field.
-
-##
 
 if 1: # fixed weir file is just referenced as static input
     mdu['geometry','FixedWeirFile'] = str(rel_static_dir / 'SBlevees_tdk.pli') 
@@ -305,18 +315,90 @@ if 1:
 
     if run_name.startswith('short'):
         mdu['output','MapInterval'] = 3600
-    
+
+
+# initialze a string to print at the end of this script
+user_instruction_string = ''
+
+if 1: # if using temperature model
+    mdu['physics','Temperature'] = 5 # this selects the "composite" temperature model
+    mdu['physics','Soiltempthick'] = 0.1 # controls heat exchange with the bed, can be used to tune temperature model if desired 
+
+    # copy the meteo grid file into the run folder
+    shutil.copyfile(os.path.join(abs_static_dir,'meteo_coarse.grd'), os.path.join(run_base_dir,'meteo_coarse.grd'))
+
+    # add lines to the external forcing file to reference meteo input that the user needs to upload!!!
+    lines=["QUANTITY=humidity_airtemperature_cloudiness",
+           "FILENAME=%s/hac.tem" % rel_bc_dir,
+           "FILETYPE=6",
+           "METHOD=3",
+           "OPERAND=O",
+           ""]
+    with open(str(old_bc_fn) ,'at') as fp:
+        fp.write("\n".join(lines))
+
+    # tell user to upload meteo file!!!
+    user_instruction_string += ("\nATTENTION!\n" + 
+    'User must manually upload the meterological forcing file, named hac.tem, and put it here:\n%s\n' % str(abs_bc_dir) + 
+    'You can find scripts for generating hac.tem in the following location on SFEI''s Google Drive:\n' + 
+    '\\1_Nutrient_Share\\2_Data_NUTRIENTS\\SFEI_Meteo\\Meteo4DFlow-SFB-UTC\\\n' + 
+    'Make sure to change the permissions of hac.tem, using chmod, once you have uploaded it, so DFM can read it!\n')
+
+
+# WIND
+#ludwig_ok=sfb_dfm_utils.add_erddap_ludwig_wind(run_base_dir,
+#                                               run_start,run_stop,
+#                                               old_bc_fn)
+#if not ludwig_ok:
+#    const_ok=sfb_dfm_utils.add_constant_wind(run_base_dir,mdu,[0,0],run_start,run_stop)
+#    assert const_ok
+#else:
+#    assert ludwig_ok # or see lsb_dfm.py for constant field.
+
+##
+# updated wind approach
+if 1:
+    # add lines to the external forcing file to reference wind input that the user needs to upload!!!
+    lines=["QUANTITY=windx",
+           "FILENAME=%s/windx.amu" % rel_bc_dir,
+           "FILETYPE=4",
+           "METHOD=1",
+           "OPERAND=O",
+           "QUANTITY=windy",
+           "FILENAME=%s/windy.amv" % rel_bc_dir,
+           "FILETYPE=4",
+           "METHOD=1",
+           "OPERAND=O",
+           ""]
+    with open(str(old_bc_fn) ,'at') as fp:
+        fp.write("\n".join(lines))
+
+    # tell user to upload wind files!!
+    user_instruction_string += ("\nATTENTION!\n" + 
+    'User must manually upload the two wind forcing files, named windx.amu and windy.amv, and put them here:\n%s\n' % str(abs_bc_dir) + 
+    'You can find scripts for generating windx.amu and windy.amv in the following location on SFEI''s Google Drive:\n' + 
+    '\\1_Nutrient_Share\\2_Data_NUTRIENTS\\SFEI_Wind\\Wind4DFlow-SFB-UTC\\\n' + 
+    'Make sure to change the permissions of windx.amu and windy.amv, using chmod, once you have uploaded them, so DFM can read them!\n')
+
+
 ##
 mdu_fn = str(run_base_dir / (run_name + ".mdu")) 
 mdu.write(mdu_fn)
 print('Just printed out %s.' % mdu_fn)
 
 
+# print user instructions
+print(user_instruction_string)
+dum = input('Press any key to continue once you have uploaded the meteo and/or wind files...')
+
+
+# in addition to making plots, this checks for NaN!!!
 if make_plots:
     from sfb_dfm_utils import plot_mdu # SW added function here 
     print('Now making plots...')
-    plot_mdu.plot_MDU(mdu_fn, net_file)
+    plot_mdu.plot_MDU(mdu_fn, str(grid_boundary_fn))
 ##
+
 
 ## As of r52184, explicitly built with metis support, partitioning can be done automatically
 ## from here.

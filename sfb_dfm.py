@@ -43,9 +43,6 @@ print('dname = ' + dname)
 
 import sfb_dfm_utils 
 
-# clunky package from allie to set up salinity and temperature initial conditions
-from initial_sal_temp.create_sal_temp_initial_conditions import make_initial_sal_temp
-from initial_sal_temp.create_ROMS_temp_tim import make_ROMS_temp_tim
 
 #%% 
 DAY=np.timedelta64(86400,'s') # useful for adjusting times
@@ -93,8 +90,9 @@ abs_static_dir = base_dir / 'inputs-static' # real location of static directory
 rel_static_dir = os.path.relpath(str(abs_static_dir), str(run_base_dir)) # static directory relative to the run directory
 rel_static_dir = Path(rel_static_dir)       # os can read Pathlib objects, so keeping formatting consistent 
 
-# added by allie to accomodate initial salinity
-abs_init_dir = base_dir / 'initial_sal_temp'
+# this is a somewhat awkward requirement due to sloppy coding by allie, helps the intial condition and ocean boudnary
+# temperature routines find everything they need
+abs_init_dir = base_dir / 'sfb_dfm_utils'
 
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
@@ -228,7 +226,7 @@ sfb_dfm_utils.add_delta_inflow(mdu,
 
 
 # prior to adding the ocean boundary, need to generate the temperature time series
-make_ROMS_temp_tim(abs_init_dir,abs_bc_dir,ref_date,run_start,run_stop)
+sfb_dfm_utils.make_ROMS_temp_tim(abs_init_dir,abs_bc_dir,ref_date,run_start,run_stop)
 
 # also copy the ROMS pli file into the bc directory
 shutil.copyfile(os.path.join(abs_static_dir,'sea_temp_ROMS.pli'), os.path.join(abs_bc_dir,'sea_temp_ROMS.pli'))
@@ -270,7 +268,7 @@ if 1:  # Copy grid file into run directory and update mdu
     dfm_grid.write_dfm(grid, str(dest) , overwrite=True)
 
 # prior to adding initial salinity to the external forcing, we have to generate it!!!
-make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir)
+sfb_dfm_utils.make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir)
 
 
 # update to work with rusty's changes to sfb_dfm_utils
@@ -280,8 +278,8 @@ make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir)
 #                                       run_start)
 # altered by Allie to use updated initial salinity and also temperature!!!
 sfb_dfm_utils.add_initial_salinity(str(run_base_dir),
-                                   #str(abs_static_dir), # removed by allie
-                                   str(abs_bc_dir), # replaced by allie
+                                   str(abs_static_dir), 
+                                   str(abs_bc_dir), # added by allie
                                    str(old_bc_fn),
                                    all_flows_unit = ALL_FLOWS_UNIT)
 

@@ -105,6 +105,9 @@ obs_shp_fn = abs_static_dir / 'observation-points.shp'
 # path to grid boundary shapefile
 grid_boundary_fn = base_dir / 'derived' / 'grid-boundary.shp'
 
+# path to cimis input file
+cimis_fn = os.path.join(base_dir,'sfbay_cimis','union_city-hourly.nc')
+
 dredge_depth = -0.5 # m NAVD88, depth to enforce at inflows and discharges
 
 
@@ -294,7 +297,7 @@ if 1:
     # update to work with rusty's updates to sfb_dfm_utils (added scale_precip)
     #sfb_dfm_utils.add_cimis_evap_precip(run_base_dir,mdu,scale_evap=0.5)
     # print('DEBUGGING THIS!!!')
-    sfb_dfm_utils.add_cimis_evap_precip(str(run_base_dir), mdu, scale_precip=1.0, scale_evap=0.5)
+    sfb_dfm_utils.add_cimis_evap_precip(cimis_fn, str(run_base_dir), mdu, scale_precip=1.0, scale_evap=0.5)
     
 if 1: # output locations
     mdu['output','CrsFile'] = str (rel_static_dir / "SB-observationcrosssection.pli")

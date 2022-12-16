@@ -20,7 +20,7 @@ from . import common
 
 ##
 
-def load_cimis(start_date,end_date):
+def load_cimis(cimis_fn, start_date,end_date):
     
     # undo this change rusty made because don't want to deal with putting cimis key in local environment
     # but also change the name to not limit to 2001-2016 and check that dates are included (alliek@sfei.org)
@@ -30,7 +30,7 @@ def load_cimis(start_date,end_date):
     #                                   cache_dir=common.cache_dir)
                                        
     # union_city=xr.open_dataset('/opt/data/cimis/union_city-hourly-2001-2016.nc')
-    union_city=xr.open_dataset('/opt/data/cimis/union_city-hourly.nc')
+    union_city=xr.open_dataset(cimis_fn)
     
     # add a check that the date range is ok
     uc_start = (np.datetime64(union_city.Date.values[0][0:10]) 
@@ -40,9 +40,9 @@ def load_cimis(start_date,end_date):
                   + np.timedelta64(union_city.Date.values[-1][11:13],'h')
                   + np.timedelta64(union_city.Date.values[-1][13:],'m'))
     if uc_start>start_date:
-        raise Exception('/opt/data/cimis/union_city-hourly.nc start date is after simulation start date')
+        raise Exception('%s start date is after simulation start date' % cimis_fn)
     if uc_end<end_date:
-        raise Exception('/opt/data/cimis/union_city-hourly.nc end date is before simulation end date')
+        raise Exception('%s end date is before simulation end date' % cimis_fn)
 
     # https://cals.arizona.edu/azmet/et1.htm
     # which says cool period, divide ETO by 0.7 to get pan evaporation,
@@ -62,10 +62,10 @@ def load_cimis(start_date,end_date):
 # relevant fields are union_city.time, union_city.HlyEvap, and union_city.HlyPrecip
 # Times are adjusted from assumed PST to UTC
 
-def add_cimis_evap_precip(run_base_dir,mdu,scale_precip=1.0,scale_evap=1.0):
+def add_cimis_evap_precip(cimis_fn, run_base_dir,mdu,scale_precip=1.0,scale_evap=1.0):
     pad=np.timedelta64(5,'D')
     t_ref,t_start,t_stop=mdu.time_range()
-    data = load_cimis(t_start-pad,t_stop+pad)
+    data = load_cimis(cimis_fn, t_start-pad,t_stop+pad)
                                        
     old_bc_fn=os.path.join(run_base_dir,mdu['external forcing','ExtForceFile'])
 

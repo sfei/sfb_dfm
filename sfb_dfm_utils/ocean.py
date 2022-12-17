@@ -219,8 +219,10 @@ def make_ROMS_temp_tim(abs_init_dir,abs_bc_dir,ref_date,run_start,run_stop):
     time = np.arange(run_start,run_stop+deltat,deltat)
     
     # convert time to day of year, since that's what the ROMS data is referenced to
-    year = pd.Timestamp(run_start).year
-    day = (time - np.datetime64('%d-01-01' % year))/np.timedelta64(1,'D')
+    year = np.array(pd.DatetimeIndex(time).year)
+    day = np.zeros(len(time))
+    for it in range(len(day)):
+        day[it] = (time[it] - np.datetime64('%d-01-01' % year[it]))/np.timedelta64(1,'D')
     
     # read ROMS data
     data = xr.open_dataset(os.path.join(abs_init_dir,'..','inputs-static','sea_temp_ROMS.nc'))

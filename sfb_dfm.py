@@ -28,27 +28,18 @@ from stompy.model.delft import dfm_grid
 from stompy.spatial import wkb2shp
 from stompy.io.local import usgs_nwis,noaa_coops
 from stompy import utils
+import sfb_dfm_utils 
 
 if __name__=='__main__':
     logging.basicConfig(level=logging.INFO)
-
 log=logging.getLogger('sfb_dfm')
-
-# Change working directory to script location
-abspath = os.path.abspath(__file__)
-dname = os.path.dirname(abspath)
-os.chdir(dname)
-
-print('dname = ' + dname)
-
-import sfb_dfm_utils 
-
 
 #%% 
 DAY=np.timedelta64(86400,'s') # useful for adjusting times
 
 # get name of run, start time, stop time, and flag to plot boundary conditions (or not) 
 # from environment variables set in run launcher script
+run_folder = os.getenv('SFB_DFM_PARENT_PATH')
 run_name = os.getenv('RUN_NAME')
 run_start = np.datetime64(os.getenv('RUN_START'))
 run_stop = np.datetime64(os.getenv('RUN_STOP'))
@@ -69,41 +60,39 @@ else:
 
 ALL_FLOWS_UNIT = False # for debug, set all volumetric flow rates to 1m3/s if True
 
-run_folder = Path(os.path.dirname(dname)) # set run folder to parent directory of sfb_dfm package
 
 ## --------------------------------------------------
 
 # Derived parameters used in multiple places
 
 # base_dir=os.path.dirname(__file__) # for command line invocation
-base_dir = Path(dname)              # right now the base dir is where this script sfb_dfm lives. 
-runs_dir =  run_folder / 'runs'     # Go to the run folder, check out if a seperate folder for runs exists... (parent directory)
-runs_dir.exists() or runs_dir.mkdir()
-run_base_dir =  runs_dir / run_name  
-run_base_dir.exists() or run_base_dir.mkdir()  # Make sure run directory exists (if not, make it..)
+base_dir = os.path.join(run_folder,'sfb_dfm')                   # right now the base dir is where this script sfb_dfm lives. 
+runs_dir =  os.path.join(run_folder,'runs')     # Go to the run folder, check out if a seperate folder for runs exists... (parent directory)
+os.path.exists(runs_dir) or os.makedirs(runs_dir)
+run_base_dir =  os.path.join(runs_dir, run_name)  
+os.path.exists(run_base_dir) or os.makedirs(run_base_dir)  # Make sure run directory exists (if not, make it..)
 print('')
 print('YOUR RUN WILL BE FOUND HERE = %s' % run_base_dir)
 print('')
 #%% 
 
-abs_static_dir = base_dir / 'inputs-static' # real location of static directory
-rel_static_dir = os.path.relpath(str(abs_static_dir), str(run_base_dir)) # static directory relative to the run directory
-rel_static_dir = Path(rel_static_dir)       # os can read Pathlib objects, so keeping formatting consistent 
+abs_static_dir = os.path.join(base_dir, 'inputs-static') # real location of static directory
+rel_static_dir = os.path.relpath(abs_static_dir, run_base_dir) # static directory relative to the run directory
 
 # this is a somewhat awkward requirement due to sloppy coding by allie, helps the intial condition and ocean boudnary
 # temperature routines find everything they need
-abs_init_dir = base_dir / 'sfb_dfm_utils'
+abs_init_dir = os.path.join(base_dir,'sfb_dfm_utils')
 
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
-net_file = base_dir / 'sfei_v20_net.nc' 
+net_file = os.path.join(base_dir, 'sfei_v20_net.nc')
 
 # No longer using any new-style boundary conditions
-old_bc_fn = run_base_dir / 'FlowFMold_bnd.ext' 
-obs_shp_fn = abs_static_dir / 'observation-points.shp'
+old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
+obs_shp_fn = os.path.join(abs_static_dir ,'observation-points.shp')
 
 # path to grid boundary shapefile
-grid_boundary_fn = base_dir / 'derived' / 'grid-boundary.shp'
+grid_boundary_fn = os.path.join(base_dir, 'derived', 'grid-boundary.shp')
 
 # path to cimis input file
 cimis_fn = os.path.join(base_dir,'sfbay_cimis','union_city-hourly.nc')
@@ -122,7 +111,7 @@ for fn in [old_bc_fn]:
 mdu = dio.MDUFile('template.mdu')
 
 # set run base path
-mdu.base_path = str(run_base_dir)   # converting Path object to string for stompy.
+mdu.base_path = run_base_dir   
 
 if 1: # set dates
     # RefDate can only be specified to day precision
@@ -131,7 +120,7 @@ if 1: # set dates
     mdu['time','TStart']  = 0
     mdu['time','TStop']   = int( (run_stop - run_start) / np.timedelta64(1,'m') )
 
-mdu['geometry','LandBoundaryFile'] = rel_static_dir / "deltabay.ldb"
+mdu['geometry','LandBoundaryFile'] = os.path.join(rel_static_dir, "deltabay.ldb")
 
 mdu['geometry','Kmx'] = 10 # 10 layers
 
@@ -147,11 +136,11 @@ grid = dfm_grid.DFMGrid(str(net_file))
     
 ## split into relative and absolute directories (alliek Dec 2020)
 rel_bc_dir = 'bc_files'
-abs_bc_dir = run_base_dir / rel_bc_dir
-abs_bc_dir.exists() or abs_bc_dir.mkdir()
+abs_bc_dir = os.path.join(run_base_dir,rel_bc_dir)
+os.path.exists(abs_bc_dir) or os.makedirs(abs_bc_dir)
 
 # features which have manually set locations for this grid
-adjusted_pli_fn = base_dir / 'nudged_features.pli' 
+adjusted_pli_fn = os.path.join(base_dir,'nudged_features.pli') 
 
 # this line worked in emma's repo that she left on hpc because, but since she cloned rusty's 
 # sfb_dfm_repo he made updates to add_sfbay_freshwater, so changing to work with rusty's updated 
@@ -167,7 +156,7 @@ adjusted_pli_fn = base_dir / 'nudged_features.pli'
 sfb_dfm_utils.add_sfbay_freshwater(mdu,
                          str(rel_bc_dir), # added rel_bc_dir alliek dec 2020
                          str(adjusted_pli_fn),
-                         freshwater_dir = str(base_dir / 'sfbay_freshwater'),
+                         freshwater_dir = os.path.join(base_dir,'sfbay_freshwater'),
                          grid = grid,
                          dredge_depth = dredge_depth,
                          all_flows_unit = ALL_FLOWS_UNIT,
@@ -182,11 +171,11 @@ sfb_dfm_utils.add_sfbay_freshwater(mdu,
 
 ## split into relative and absolute directories (alliek Dec 2020)
 rel_src_dir = 'source_files'
-src_dir     = run_base_dir / rel_src_dir
-src_dir.exists() or src_dir.mkdir() 
+src_dir     = os.path.join(run_base_dir, rel_src_dir)
+os.path.exists(src_dir) or os.makedirs(src_dir) 
 
 # path to potw repository
-potw_dir  =  base_dir / 'sfbay_potw'
+potw_dir  =  os.path.join(base_dir,'sfbay_potw')
 
 # this line worked in emma's hpc repo but rusty made updates since then, so changing to 
 # work with rusty's updated sfb_dfm_utils
@@ -198,9 +187,9 @@ potw_dir  =  base_dir / 'sfbay_potw'
 #                             old_bc_fn,
 #                             all_flows_unit=ALL_FLOWS_UNIT)
 sfb_dfm_utils.add_sfbay_potw(mdu, 
-                             str(rel_src_dir), # added rel_src_dir alliek dec 2020
-                             str(potw_dir), 
-                             str(adjusted_pli_fn), 
+                             rel_src_dir, # added rel_src_dir alliek dec 2020
+                             potw_dir, 
+                             adjusted_pli_fn, 
                              grid,
                              dredge_depth, 
                              all_flows_unit = ALL_FLOWS_UNIT, 
@@ -218,8 +207,8 @@ temp_rio    = run_start>np.datetime64('2010-01-01')<run_stop<np.datetime64('2020
 # saved over rusty's delta_inflow.py with emma's version but then changed to be more like rusty's 
 # for better handling of boundary condition directory
 sfb_dfm_utils.add_delta_inflow(mdu,
-                               str(rel_bc_dir),
-                               static_dir = str(abs_static_dir),
+                               rel_bc_dir,
+                               static_dir = abs_static_dir,
                                grid = grid,
                                dredge_depth = dredge_depth,
                                all_flows_unit = ALL_FLOWS_UNIT,
@@ -241,16 +230,16 @@ shutil.copyfile(os.path.join(abs_static_dir,'sea_temp_ROMS.pli'), os.path.join(a
 # but SF currents at about -15 minutes (leading).  All of these
 # are likely wrapped up in some friction calibration, for another
 # day.
-sfb_dfm_utils.add_ocean(str(run_base_dir),
-                        str(rel_bc_dir),
+sfb_dfm_utils.add_ocean(run_base_dir,
+                        rel_bc_dir,
                         run_start,
                         run_stop,
                         ref_date,
-                        static_dir = str(abs_static_dir),
+                        static_dir = abs_static_dir,
                         grid = grid,
                         factor = 0.901,
                         lag_seconds = 120,
-                        old_bc_fn = str(old_bc_fn),
+                        old_bc_fn = old_bc_fn,
                         all_flows_unit = ALL_FLOWS_UNIT)
 
 ## 
@@ -266,7 +255,7 @@ if 1:
 
 if 1:  # Copy grid file into run directory and update mdu
     mdu['geometry','NetFile'] = net_file.name
-    dest = run_base_dir / mdu['geometry','NetFile']
+    dest = os.path.join(run_base_dir, mdu['geometry','NetFile'])
     # write out the modified grid
     dfm_grid.write_dfm(grid, str(dest) , overwrite=True)
 
@@ -280,15 +269,15 @@ sfb_dfm_utils.make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir)
 #                                       mdu,
 #                                       run_start)
 # altered by Allie to use updated initial salinity and also temperature!!!
-sfb_dfm_utils.add_initial_salinity(str(run_base_dir),
-                                   str(abs_static_dir), 
-                                   str(abs_bc_dir), # added by allie
-                                   str(old_bc_fn),
+sfb_dfm_utils.add_initial_salinity(run_base_dir,
+                                   abs_static_dir, 
+                                   abs_bc_dir, # added by allie
+                                   old_bc_fn,
                                    all_flows_unit = ALL_FLOWS_UNIT)
 
 
 if 1: # fixed weir file is just referenced as static input
-    mdu['geometry','FixedWeirFile'] = str(rel_static_dir / 'SBlevees_tdk.pli') 
+    mdu['geometry','FixedWeirFile'] = os.path.join(rel_static_dir,'SBlevees_tdk.pli') 
 
 if 1: 
     # evaporation was a bit out of control in south bay - try scaling back just
@@ -297,10 +286,10 @@ if 1:
     # update to work with rusty's updates to sfb_dfm_utils (added scale_precip)
     #sfb_dfm_utils.add_cimis_evap_precip(run_base_dir,mdu,scale_evap=0.5)
     # print('DEBUGGING THIS!!!')
-    sfb_dfm_utils.add_cimis_evap_precip(cimis_fn, str(run_base_dir), mdu, scale_precip=1.0, scale_evap=0.5)
+    sfb_dfm_utils.add_cimis_evap_precip(cimis_fn, run_base_dir, mdu, scale_precip=1.0, scale_evap=0.5)
     
 if 1: # output locations
-    mdu['output','CrsFile'] = str (rel_static_dir / "SB-observationcrosssection.pli")
+    mdu['output','CrsFile'] = os.path.join(rel_static_dir, "SB-observationcrosssection.pli")
 
 ##
 if 1:
@@ -308,7 +297,7 @@ if 1:
     obs_pnts = wkb2shp.shp2geom(str(obs_shp_fn))
     obs_fn   = 'observation_pnts.xyn'
     
-    with open( str(run_base_dir/obs_fn),'wt') as fp:
+    with open( os.path.join(run_base_dir,obs_fn),'wt') as fp:
         for idx,row in enumerate(obs_pnts):
             xy = np.array(row['geom'])
             fp.write("%12g %12g '%s'\n"%(xy[0], xy[1], row['name']))
@@ -335,7 +324,7 @@ if 1: # if using temperature model
            "METHOD=3",
            "OPERAND=O",
            ""]
-    with open(str(old_bc_fn) ,'at') as fp:
+    with open(old_bc_fn ,'at') as fp:
         fp.write("\n".join(lines))
 
     # tell user to upload meteo file!!!
@@ -371,7 +360,7 @@ if 1:
            "METHOD=1",
            "OPERAND=O",
            ""]
-    with open(str(old_bc_fn) ,'at') as fp:
+    with open(old_bc_fn ,'at') as fp:
         fp.write("\n".join(lines))
 
     # tell user to upload wind files!!
@@ -383,7 +372,7 @@ if 1:
 
 
 ##
-mdu_fn = str(run_base_dir / (run_name + ".mdu")) 
+mdu_fn = os.path.join(run_base_dir,(run_name + ".mdu")) 
 mdu.write(mdu_fn)
 print('Just printed out %s.' % mdu_fn)
 
@@ -397,7 +386,7 @@ dum = input('Press any key to continue once you have uploaded the meteo and/or w
 if make_plots:
     from sfb_dfm_utils import plot_mdu # SW added function here 
     print('Now making plots...')
-    plot_mdu.plot_MDU(mdu_fn, str(grid_boundary_fn))
+    plot_mdu.plot_MDU(mdu_fn, grid_boundary_fn)
 ##
 
 

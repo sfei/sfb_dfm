@@ -7,8 +7,8 @@
 # 	(3) add back the missing source flows (bug in this version of the DFM model is that they are left out, violating mass conservation)
 
 # User input: 
-RUN_NAME="wy2004"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
-SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2004     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+RUN_NAME="wy2013c_with_temp"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
+SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2013/wy2013c_with_temp     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 NPROC=16                                    # number of processors (16 is a good number)
 DFMV=/opt/software/delft/dfm/r52184-opt/bin # path to DFM binaries
 DDCOUPLEV=/opt/software/delft/ddcouplefm/1.02.01.50002/lnx64 # path to ddcouple, the executable from deltares that stitches dwaq output together

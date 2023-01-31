@@ -37,8 +37,11 @@
     contain freshwater inputs from the tributaries and the potw's, respectively. take 
     a moment to make sure that these contain data through the simulation period
         cd /run_path/run_folder/sfb_dfm/
-        clone https://stash.sfei.org/scm/nobm/sfbay_freshwater.git
-        clone https://stash.sfei.org/scm/nobm/sfbay_potw.git 
+        git clone https://stash.sfei.org/scm/nobm/sfbay_freshwater.git
+        git clone https://stash.sfei.org/scm/nobm/sfbay_potw.git 
+    note, if you have some problems with sfbay_potw, and your run is for wy2019 or 
+    earlier, you might want to try using Emma's older version of the repo:
+        git clone https://github.com/emmashie/sfbay_potw
 		
 Now you have most of the pieces in place to set up the run. You should take a moment to check
 that the input files inside all these repositories have data during your intended simulation period!
@@ -85,33 +88,35 @@ calls python. Here is how to do it:
     and sources to be plotted (note plotting boundary conditions also checks for nan's
     so it's a good idea to do this)
 
- 7a) now run run_launcher_part_1.sh to call sfb_dfm.py, which sets up the vast majority of 
-	 the model input files. The main input file is the run_name.mdu file, and this file points to 	
-     everything else. To execute from command line:
+ 7a) prepare to run the setup scripts in python by activating a conda environment that has all
+     the necessary packages. if you are on richmond.sfei.org, the base environment will work. on 
+     any of the newer servers (chicago.sfei.org, boise.sfei.org, fortcollins.sfei.org), there is
+     an environment called "delft_env" that has all the packages you should need. from the command line, enter
+        conda activate delft_env
+     (see Allie's notes about setting up the delft_env anaconda environment here: 
+     https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/edit#bookmark=id.j7qlzh3zbl0h)
+
+ 7b) now change directory to sfb_dfm and run the run_launcher_part_1.sh script to call sfb_dfm.py, 
+     which sets up the vast majority of the model input files. The main input file is the run_name.mdu 
+     file, and this file points to everything else. To execute from command line:
         ./run_launcher_part_1.sh
      you may need to change permissions in order to execute:
         chmod 777 run_launcher_part_1.sh
      This script will set your PYTHONPATH environment variable to point to the copy 
-     of stompy installed in the same parent directory as the sfb_dfm package.
+     of stompy installed in the same parent directory as the sfb_dfm package
 	
- 7b) if you run into an error running run_launcher_part_1.sh, you may want to run sfb_dfm.py in 
-     ipython instead of from a shell script. in this case, you should copy and paste everything 
-	 in the run_launcher_part_1.sh script up through right before the following line:
-        $PPATH $SFB_DFM_PARENT_PATH/sfb_dfm/sfb_dfm.py
-     into your Linux shell. Then if you are on chicago, boise, or fortcollins, activate the anaconda
-	 environment we use to run DFM as follows:
-        conda activate delft_env
-	 (see Allie's notes about setting up the delft_env anaconda environment here: 
-	 https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/edit#bookmark=id.j7qlzh3zbl0h)
-     launch ipython:
+ 7c) if you run into an error running run_launcher_part_1.sh, you may want to run sfb_dfm.py in 
+     ipython instead of from a shell script in order to more easily troubleshoot. in this case, you should copy 
+     and paste everything in the run_launcher_part_1.sh script up through right before the following line:
+        python sfb_dfm.py
+     into your Linux shell to set all the necessary environment variables. then launch ipython:
         ipython --pylab
      and run sfb_dfm.py:
         %run sfb_dfm.py
 
 Now we need to take a moment to generate some more input data. The wind and meterological input need to be generated using
-repositories that live on SFEI's Google Drive, and you either need to use a laptop running Google Drive for Desktop (formerly
-called Filestream) with the correct folders mounted, or you need to download the whole repository to your computer, and they are
-big, so you don't want to do that. Make sure these inputs are in the UTC time zone like the rest of the model
+repositories that live on SFEI's Google Drive. You can either ask Allie to do this (it takes her all of 5 minutes to launch the
+scripts), or you can try to generate them yourself. To generate them yourself, you either need to use a laptop running Google Drive for Desktop (formerly called Filestream) with the correct folders mounted, or you need to download the whole repository to your computer, and they are big, so you probably don't want to do that. Make sure these inputs are in the UTC time zone like the rest of the model
 
  8) generate the wind inputs using the following repository:
 		1_Nutrient_Share/2_Data_NUTRIENTS/SFEI_Wind/ 
@@ -119,9 +124,8 @@ big, so you don't want to do that. Make sure these inputs are in the UTC time zo
 	check the README.txt and Documentation folder to learn how this repo works, or skip ahead and just 
 	modify and run the python script /SFEI_Wind/Wind4DFlow-SFB-UTC/generate_amu_amv_4SFB.py
 	to generate the input files you need. the files are generated in the same folder as this script, and you 
-    can pick the name. if you end up with an empty file, you're going to need to 
-	download and process more wind data, and you will have to read about how to do that in the documentation 
-	folder. 
+    can pick the name. if you end up with an empty file, you're going to need to download and process more wind 
+    data, and you will have to read about how to do that in the documentation folder. 
 	
  9) generate the meteorlogical inputs using the following repository:
 		1_Nutrient_Share/2_Data_NUTRIENTS/SFEI_Meteo/
@@ -154,18 +158,31 @@ big, so you don't want to do that. Make sure these inputs are in the UTC time zo
         chmod ugo+r *
 		
 Now you have all your input data together and are ready to run the model! the "part 2" run launcher
-runs DFM and does some basic postprocessing as well
+runs DFM and does some basic postprocessing as well. Make sure to activate the appropriate anaconda environment,
+as you did for run_launcher_part_1.sh
 
- 9) Edit the user input portion of run_launcher_part_2.sh, and then excecute this script
+ 9a) Edit the user input portion of run_launcher_part_2.sh, and then excecute this script
         ./run_launcher_part_2.sh
-    you may need to change permissions to execute:
+     you may need to change permissions to execute:
         chmod 777 run_launcher_part_2.sh
+     note this script makes some assumptions about where the dflowfm binaries are stored on your server --
+     it is set up to run at SFEI on richmond, chicago, boise, or fortcollins. if your setup is different you
+     will need to change the environment variables
 
-10) Note that if the run executes and generates even partial output, run_launcher_part_2.sh will also 
-    automatically perform two postprocessing steps:
-        a. Stitch together the multi-domain DWAQ hydro input files into one
+ 9b) If run_launcher_part_2.sh crashes during the mutidomain partitioning step:
+        dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_NAME.mdu >partition.txt
+     or during the launch of the parallel model run:
+        mpiexec -n $NPROC dflowfm --autostartstop $RUN_NAME.mdu > out.txt 2> err.txt
+     it may help to troubleshoot by running the code in serial. to do so, make sure you have copied and
+     pasted everything in run_launcher_part_2.sh until the partitioning step, and then enter into the command line:
+        dflowfm --autostartstop $RUN_NAME.mdu
+
+ 9c) Note that if the run executes and generates even partial output, run_launcher_part_2.sh will also 
+     automatically perform two postprocessing steps:
+        a. Stitch together the multi-domain DWAQ hydro input files into one using the ddcouple utility that 
+           comes from Deltares
         b. Make a correction to the flows in the DWAQ run_name.flo file, necessary because the version of DFM
-           we have been using (r52184-opt) leaves out the POTW inflows, violating conservation of mass
+           we have been using (r52184-opt) leaves out the POTW inflows, violating conservation of mass 
 
 Now you are all done, hooray! 
 

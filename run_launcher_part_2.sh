@@ -7,12 +7,11 @@
 # 	(3) add back the missing source flows (bug in this version of the DFM model is that they are left out, violating mass conservation)
 
 # User input: 
-RUN_NAME="wy2013c_with_temp"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
-SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2013/wy2013c_with_temp     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+RUN_NAME="wy2006_alliek"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
+SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2006     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 NPROC=16                                    # number of processors (16 is a good number)
 DFMV=/opt/software/delft/dfm/r52184-opt/bin # path to DFM binaries
 DDCOUPLEV=/opt/software/delft/ddcouplefm/1.02.01.50002/lnx64 # path to ddcouple, the executable from deltares that stitches dwaq output together
-PPATH=/opt/anaconda3/envs/delft_env/bin/python # path to python executable (this should be /opt/anaconda3/bin/python3 on richmond, /opt/anaconda3/envs/delft_env/bin/python on all other servers)
 
 # assumes run directory is in same parent directory as sfb_dfm package
 # (if someone changes this in sfb_dfm.py, this will not be true anymore, so you'll

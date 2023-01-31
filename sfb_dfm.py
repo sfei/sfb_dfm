@@ -103,7 +103,7 @@ dredge_depth = -0.5 # m NAVD88, depth to enforce at inflows and discharges
 
 # clear any stale bc files:
 for fn in [old_bc_fn]:
-    fn.exists() and fn.unlink() 
+    os.path.exists(fn) and os.unlink(fn) 
 
 #%% 
 ## --------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ mdu['geometry','Kmx'] = 10 # 10 layers
 
 # update location of the boundary conditions
 # this has the source/sinks which cannot be written in the new style file
-mdu['external forcing','ExtForceFile'] = old_bc_fn.name
+mdu['external forcing','ExtForceFile'] = old_bc_fn
 
 #%%
 # Load the grid now -- it's used for clarifying some inputs, but
@@ -254,7 +254,7 @@ if 1:
         fp.write("\n".join(lines))
 
 if 1:  # Copy grid file into run directory and update mdu
-    mdu['geometry','NetFile'] = net_file.name
+    mdu['geometry','NetFile'] = net_file
     dest = os.path.join(run_base_dir, mdu['geometry','NetFile'])
     # write out the modified grid
     dfm_grid.write_dfm(grid, str(dest) , overwrite=True)
@@ -332,6 +332,7 @@ if 1: # if using temperature model
     'User must manually upload the meterological forcing file, named hac.tem, and put it here:\n%s\n' % str(abs_bc_dir) + 
     'You can find scripts for generating hac.tem in the following location on SFEI''s Google Drive:\n' + 
     '\\1_Nutrient_Share\\2_Data_NUTRIENTS\\SFEI_Meteo\\Meteo4DFlow-SFB-UTC\\\n' + 
+    '(https://drive.google.com/drive/folders/16ILqtvXCRjAupDagCSRMLPFE-0oWMBum)\n' +
     'Make sure to change the permissions of hac.tem, using chmod, once you have uploaded it, so DFM can read it!\n')
 
 
@@ -368,6 +369,7 @@ if 1:
     'User must manually upload the two wind forcing files, named windx.amu and windy.amv, and put them here:\n%s\n' % str(abs_bc_dir) + 
     'You can find scripts for generating windx.amu and windy.amv in the following location on SFEI''s Google Drive:\n' + 
     '\\1_Nutrient_Share\\2_Data_NUTRIENTS\\SFEI_Wind\\Wind4DFlow-SFB-UTC\\\n' + 
+    '(https://drive.google.com/drive/folders/1WzqvNo0I0yoWI3KHeDkvtnCrp_MqY5t4)\n' +
     'Make sure to change the permissions of windx.amu and windy.amv, using chmod, once you have uploaded them, so DFM can read them!\n')
 
 

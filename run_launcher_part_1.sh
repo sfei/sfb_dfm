@@ -9,10 +9,6 @@ export RUN_START="2005-08-01"  # run start time in YYYY-MM-DD format
 export RUN_STOP="2006-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
 export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2006     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
-PPATH=/opt/anaconda3/envs/delft_env/bin/python # path to python executable (/opt/anaconda3/bin/python3 on richmond, /opt/anaconda3/envs/delft_env/bin/python on all other servers)
-
-# get the parent directory of the sfb_dfm package 
-#SFB_DFM_PARENT_PATH=$(dirname $(dirname $(readlink -f "$0"))) # <<< you can use this command to get the path automatically, assuming this shell script is in the sfb_dfm directory
 
 # echo SFB_DFM_PARENT_PATH
 echo ""
@@ -28,13 +24,12 @@ echo ""
 
 # add stompy to pythonpath
 echo "Adding stompy to PYTHONPATH":
-#export PYTHONPATH=$STOMPY_PATH:$PYTHONPATH 
-export PYTHONPATH=$STOMPY_PATH    # this overrides paths to pre-existing stompy (safest option)
+export PYTHONPATH=$STOMPY_PATH:$PYTHONPATH   
 echo "PYTHONPATH="$PYTHONPATH
 echo ""
 
 # now run sfb_dfm.py to set up the run
 echo "Running sfb_dfm.py"
 echo ""
-$PPATH $SFB_DFM_PARENT_PATH/sfb_dfm/sfb_dfm.py
+python sfb_dfm.py
 echo ""

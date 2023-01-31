@@ -4,11 +4,11 @@
 # sfb_dfm.py, which creates most of the input files for an open bay DFM run
 
 # User input: 
-export RUN_NAME="wy2004"         # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2003-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2004-10-01"   # run end time in YYYY-MM-DD format
+export RUN_NAME="wy2006_alliek"         # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2005-08-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2006-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2004     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2006     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 PPATH=/opt/anaconda3/envs/delft_env/bin/python # path to python executable (/opt/anaconda3/bin/python3 on richmond, /opt/anaconda3/envs/delft_env/bin/python on all other servers)
 
 # get the parent directory of the sfb_dfm package 

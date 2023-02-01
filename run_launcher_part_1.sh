@@ -7,7 +7,7 @@
 # or on richmond, you don't need to do anything because the base environment is fine
 
 # User input: 
-export RUN_NAME="wy2006_alliek"         # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_NAME="testa"         # name of the run (this will be name of *.mdu file and folder it's stored in)
 export RUN_START="2005-08-01"  # run start time in YYYY-MM-DD format
 export RUN_STOP="2006-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions

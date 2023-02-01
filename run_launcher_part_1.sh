@@ -2,6 +2,9 @@
 
 # This script adds stompy to the pythonpath environment variable and then runs 
 # sfb_dfm.py, which creates most of the input files for an open bay DFM run
+# make sure you have activated an appropriate conda environment before running
+# this script -- on chicago, boise, or fortcollins enter "conda activate delft_env"
+# or on richmond, you don't need to do anything because the base environment is fine
 
 # User input: 
 export RUN_NAME="wy2006_alliek"         # name of the run (this will be name of *.mdu file and folder it's stored in)

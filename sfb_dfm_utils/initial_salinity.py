@@ -99,8 +99,8 @@ def make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir):
     # interpolate onto)
     grid_fn = os.path.join(abs_init_dir,'..','sfei_v20_net.nc')
     
-    # time window for including cruise data (search on either side of the start time, so 15 days means a total 30 day window)
-    time_window = np.timedelta64(15,'D')
+    # time window for including cruise data (search on either side of the start time, so 25 days means a total 50 day window)
+    time_window = np.timedelta64(25,'D')
     
     # set a constant ocean boundary salinity 
     ocean_salinity = 33.0

@@ -28,8 +28,9 @@ import matplotlib.gridspec as gridspec
 # mdu_filename = r'/hpcvol2/Open_Bay/Hydro_model/Full_res/WY2017/wy2017_usgs_bc/wy2017_usgs_bc.mdu' #<<<< input here
 
 
-
 def plot_MDU(mdu_filename, gridpath): 
+
+    numnanfiles = 0
 
     #------------- script now takes over -------------------------------------------
     mdu_filename = Path(mdu_filename)
@@ -140,7 +141,8 @@ def plot_MDU(mdu_filename, gridpath):
                             lines = f.readlines()
                             for line in lines:
                                 if 'nan' in line.lower():
-                                    raise Exception('NaN found in %s' % fname)
+                                    print('WARNING!!! NaN found in %s' % fname)
+                                    numnanfiles+=1
 
                         fig, ax = plt.subplots(figsize=(8,8))
                         ax.axis((0,1,0,1))
@@ -155,7 +157,8 @@ def plot_MDU(mdu_filename, gridpath):
     
                         ####### check for NaN ######
                         if np.any(np.isnan(df1.values)):
-                            raise Exception('NaN found in %s' % fname)
+                            print('WARNING!!! NaN found in %s' % fname)
+                            numnanfiles+=1
     
                         # make a plot
                         fig, ax = plt.subplots(tight_layout=True, figsize=(11,11))
@@ -200,7 +203,8 @@ def plot_MDU(mdu_filename, gridpath):
                             
                         ####### check for NaN ######
                         if np.any(np.isnan(df1.values)):
-                            raise Exception('NaN found in %s' % fname)
+                            print('WARNING!!! NaN found in %s' % fname)
+                            numnanfiles+=1
                             
                         # extract the time and scalar values
                         time = t_ref + df1[0].values.astype('timedelta64[%s]' % tunit)
@@ -229,7 +233,8 @@ def plot_MDU(mdu_filename, gridpath):
                         
                         ####### check for NaN ######
                         if np.any(np.isnan(df1.values)):
-                            raise Exception('NaN found in %s' % fname)
+                            print('WARNING!!! NaN found in %s' % fname)
+                            numnanfiles+=1
                         
                         # extract the time and scalar values
                         time = t_ref + df1[0].values.astype('timedelta64[%s]' % tunit)
@@ -269,7 +274,8 @@ def plot_MDU(mdu_filename, gridpath):
                             
                             ####### check for NaN ######
                             if np.any(np.isnan(df1.values)):
-                                raise Exception('NaN found in %s' % fname)
+                                print('WARNING!!! NaN found in %s' % fname)
+                                numnanfiles+=1
                             
                             # add up the flows
                             if i==0:
@@ -315,7 +321,8 @@ def plot_MDU(mdu_filename, gridpath):
                             
                             ####### check for NaN ######
                             if np.any(np.isnan(df1.values)):
-                                raise Exception('NaN found in %s' % fname)
+                                print('WARNING!!! NaN found in %s' % fname)
+                                numnanfiles+=1
                             
                             # extract the time and scalar values
                             time = t_ref + df1[0].values.astype('timedelta64[%s]' % tunit)
@@ -336,3 +343,7 @@ def plot_MDU(mdu_filename, gridpath):
 
 
 
+    if numnanfiles>0:
+        print('ERROR: NaNs found in %d files, see above ...' % numnanfiles)
+    else:
+        pring('HOORAY! No NaNs found in input files')

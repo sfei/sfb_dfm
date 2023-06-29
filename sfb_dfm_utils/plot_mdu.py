@@ -70,6 +70,7 @@ def plot_MDU(mdu_filename, gridpath):
     boundary_type_list =  ['frictioncoefficient',
                            'initialsalinity',
                            'initialtemperature',
+                           'secchidepth',
                            'rainfall',
                            'waterlevelbnd',
                            'discharge_salinity_temperature_sorsin',
@@ -152,7 +153,7 @@ def plot_MDU(mdu_filename, gridpath):
                         save_image(fig, os.path.basename(fname).replace('.','_DOT_'), pdf)
 
     
-                    elif btype in ['frictioncoefficient','initialtemperature','initialsalinity']:
+                    elif btype in ['frictioncoefficient','initialtemperature','initialsalinity','secchidepth']:
     
                         df1 = pd.read_csv(os.path.join(base_dir,fname), delim_whitespace=True, header=None)
     
@@ -242,7 +243,7 @@ def plot_MDU(mdu_filename, gridpath):
                         scalar = df1[1].values
                         ax1.plot(time, scalar) 
                         ax1.set_title('%s (%s)' % (fname, boundary_type))
-                        ax1.grid(b = True, alpha = 0.25)
+                        ax1.grid(alpha = 0.25)
                         ax1.set_ylabel('precipitation - evaporation')
                         format_xaxis(ax1) 
                         save_image(fig, os.path.basename(fname).strip('.tim'), pdf)
@@ -288,7 +289,7 @@ def plot_MDU(mdu_filename, gridpath):
                                 legstr += ' + ' + names[i] + '.tim'
                         ax1.set_title('%s (%s)' % (fname, boundary_type))
                         ax1.plot(time, flow, label=legstr)    
-                        ax1.grid(b = True, alpha = 0.25)
+                        ax1.grid(alpha = 0.25)
                         ax1.legend()
                         ax1.set_ylabel('discharge')
                         format_xaxis(ax1) 
@@ -330,7 +331,7 @@ def plot_MDU(mdu_filename, gridpath):
                             scalar = df1[1].values
                             ax1.plot(time, scalar, label=names[i] + '.tim') 
                         ax1.set_title('%s (%s)' % (fname, boundary_type))
-                        ax1.grid(b = True, alpha = 0.25)
+                        ax1.grid(alpha = 0.25)
                         ax1.legend()
                         ax1.set_ylabel(btype.replace('bnd',''))
                         format_xaxis(ax1) 

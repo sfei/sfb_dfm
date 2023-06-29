@@ -7,11 +7,11 @@
 # or on richmond, you don't need to do anything because the base environment is fine
 
 # User input: 
-export RUN_NAME="wy2011-wy2012"         # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2010-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2012-10-01"   # run end time in YYYY-MM-DD format
+export RUN_NAME="wy2022"         # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2021-08-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2022-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-export SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2011-wy2012     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/fortcollinsvol1/hpcshared/open_bay/hydro/full_res/wy2022     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 
 # echo SFB_DFM_PARENT_PATH
 echo ""

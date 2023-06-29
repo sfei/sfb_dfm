@@ -1,1 +1,0 @@
-Filename to pull model inputs must be 'union_city-hourly-2001-2016.nc' to match the code in sfb_dfm_utils (github/rustychris) but the file may contain more than 2001-2016 data.

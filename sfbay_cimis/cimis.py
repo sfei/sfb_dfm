@@ -88,13 +88,10 @@ def cimis_fetch_to_xr(stations, # Union City
                 'hly-sol-rad','hly-wind-dir',
                 'hly-wind-spd']
 
-    if isinstance(stations,np.int) or isinstance(stations,str):
+    if isinstance(stations,int) or isinstance(stations,str):
         stations=[stations]
 
     stations=[str(s) for s in stations] 
-
-    start_date,end_date=[ utils.to_datetime(d).strftime('%Y-%m-%d')
-                          for d in (start_date,end_date) ]
 
     req=requests.get(url,params=dict(appKey=appKey,
                                      targets=",".join(stations), 
@@ -114,32 +111,52 @@ def cimis_fetch_to_xr(stations, # Union City
 
 ## 
 
-if 0:
-    df=cimis_fetch_to_xr(171,
-                         np.datetime64('2012-07-01'),
-                         np.datetime64('2012-08-01') )
-
 ## 
 
 #2/5/2001 is start of record for union city
-period=[np.datetime64('2001-02-01'),
-        np.datetime64('2022-08-19')]
+start_date = '2021-01-01'
+end_date = '2022-12-31'
 
-period_dns=[utils.to_dnum(d) for d in period]
+#period=[np.datetime64('2001-02-01'),
+#        np.datetime64('2022-08-19')]
+
+
+#period_dns=[utils.to_dnum(d) for d in period]
+# on richmond, this returns period_dns = [730517.0, 738386.0]
 
 span_days=30
 
+# create lists of start and end dates to break data into chunks
+ts = np.datetime64(start_date,'D')
+te = np.datetime64(end_date,'D')
+t1 = ts
+t2 = t1 + np.timedelta64(span_days,'D')
+time_windows = [(t1,t2)]
+while t2<te:
+    t1 = t2
+    t2 = t1 + np.timedelta64(span_days,'D')
+    if t2>te:
+        t2=te
+    time_windows.append((t1,t2))
+
 dfs={}
 
-for win_start in np.arange(period_dns[0],period_dns[1],span_days):
-    win_end=win_start+span_days
-    if win_start in dfs:
-        print("Skip")
-        continue
-    dt=utils.to_datetime(win_start).strftime('%Y-%m-%d')
-    print("Fetching %s"%dt)
+### note when we run 
+counter = 0
+for time_window in time_windows:
+    
+    counter = counter + 1
+
+    win_start = time_window[0]
+    win_end = time_window[1]
+
+    print("Fetching %s"%win_start)
     df=cimis_fetch_to_xr(171,win_start,win_end,station_meta=False)
-    dfs[win_start]=df
+
+
+    # on richmond fails with ConnectionError: HTTPConnectionPool(host='et.water.ca.gov', port=80): Max retries exceeded with url: /api/data?startDate=2001-02-01&targets=171&dataItems=hly-air-tmp%2Chly-eto%2Chly-net-rad%2Chly-precip%2Chly-rel-hum%2Chly-res-wind%2Chly-sol-rad%2Chly-wind-dir%2Chly-wind-spd&unitOfMeasure=M&appKey=98b9b76d-2ce5-4210-b4ae-9274524ad28a&endDate=2001-03-03 (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f0ec0560eb8>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution',))
+
+    dfs[counter]=df
     print("Delay...")
     time.sleep(1.5) # be kind to others
     print("Done")
@@ -164,9 +181,9 @@ df_full['time']=( ('Date',), dates )
 
 ## 
 
-sel=utils.select_increasing(df.time.values)
-df_full=df_full.isel(Date=sel)
+#sel=utils.select_increasing(df.time.values)
+#df_full=df_full.isel(Date=sel)
 
 ## 
 
-df_full.to_netcdf('union_city-hourly-2001-2022_bloom.nc')
+df_full.to_netcdf('union_city-hourly.nc')

@@ -28,6 +28,7 @@ import logging
 logger=logging.getLogger('initial_salinity')
 
 # allie added temperatuere to this too....
+# then later allie added secchidepth as well!
 def add_initial_salinity(run_base_dir,
                          static_dir, 
                          abs_bc_dir, 
@@ -52,6 +53,12 @@ def add_initial_salinity(run_base_dir,
                  "METHOD=5",
                  "OPERAND=O",
                  ""]
+        lines+=[ "QUANTITY=secchidepth",                      # added by allie too
+                 "FILENAME=%s/secchidepth.xyz"%bc_dir_rel,
+                 "FILETYPE=7",
+                 "METHOD=5",
+                 "OPERAND=O",
+                 ""]
 
     else: #  constant 35 ppt initial condition:
         print("-=-=-=- USING 35 PPT WHILE TESTING! -=-=-=-")
@@ -70,11 +77,12 @@ def add_initial_salinity(run_base_dir,
     with open(old_bc_fn,'at') as fp:
         fp.write("\n".join(lines))
 
-def make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir):
+def make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir):
 
     ''' allie wrote this around Oct 2022 for HAB simulation, then generalized in Dec
     start time is a numpy datetime object correspondign to the start date and time of the model run
-    and abs_init_dir is the absolute path to sfb_dfm/init_sal_temp, i.e. the folder where this script is found'''
+    and abs_init_dir is the absolute path to sfb_dfm/init_sal_temp, i.e. the folder where this script is found
+    allie added secchidepth in July 2023, for now use average over whole simulation period'''
 
     # cruise data filename -- prior to running this script, download it manually 
     # from here: https://sfbay.wr.usgs.gov/water-quality-database/
@@ -99,8 +107,8 @@ def make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir):
     # interpolate onto)
     grid_fn = os.path.join(abs_init_dir,'..','sfei_v20_net.nc')
     
-    # time window for including cruise data (search on either side of the start time, so 25 days means a total 50 day window)
-    time_window = np.timedelta64(25,'D')
+    # time window for including cruise data (search on either side of the start time, so 35 days means a total 70 day window)
+    time_window = np.timedelta64(35,'D')
     
     # set a constant ocean boundary salinity 
     ocean_salinity = 33.0
@@ -144,8 +152,28 @@ def make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir):
             time = '0' + time
         datetime.append(pd.Timestamp('%s %s' % (date,time),tz='US/Pacific').tz_convert('UTC').replace(tzinfo=None))
     cruise_data['time'] = np.array(datetime).astype('datetime64[s]')
+
+    # add latitude and longitude to cruise data, and rename the temperature column
+    cruise_data['x'] = cruise_data['Station'].map(stn2xutm)
+    cruise_data['y'] = cruise_data['Station'].map(stn2yutm)
+    cruise_data.rename(columns={'Temperature (Degrees Celsius)':'Temperature'}, inplace=True)
     
-    # only use the cruise data within the prescribed time window around the start date
+    # make sure there are data within the time window of the start date and the end date
+    ind1 = np.abs(cruise_data['time'].values - run_start) <= time_window
+    ind2 = np.abs(cruise_data['time'].values - run_stop) <= time_window
+    if not (np.any(ind1) and np.any(ind2)):
+        raise Exception('data in %s must come within %s of %s and %s; go to '  % (cruise_data_fn,time_window,run_start,run_stop) + 
+                        'https://sfbay.wr.usgs.gov/water-quality-database/, download the data in this time window, and' + 
+                        'manually place it in the sfb_dfm/initial_sal_temp/ folder. sorry this part is not automated yet!')
+  
+    # for the secchidepth, we want all data within the simulation period, but only where light extinction was measured
+    # compute secchi depth from light extinction coefficient, according to DFM manual
+    ind = np.logical_and(~np.isnan(cruise_data['Extinction Coefficient'].values),
+                         np.logical_and(cruise_data['time'].values>=run_start, cruise_data['time'].values<=run_stop))
+    light_data = cruise_data.loc[ind].reset_index()
+    light_data['secchidepth'] = 1.7 / light_data['Extinction Coefficient'] # DFM manual says Kd=1.7/Secchidepth
+
+    # make sure there is data within the time window of the start date and the end date
     ind = np.abs(cruise_data['time'].values - run_start) <= time_window
     if np.any(ind):
         cruise_data = cruise_data.loc[ind]
@@ -154,11 +182,19 @@ def make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir):
                         'https://sfbay.wr.usgs.gov/water-quality-database/, download the data in this time window, and' + 
                         'manually place it in the sfb_dfm/initial_sal_temp/ folder. sorry this part is not automated yet!')
     
-    # add latitude and longitude to cruise data, and rename the temperature column
-    cruise_data['x'] = cruise_data['Station'].map(stn2xutm)
-    cruise_data['y'] = cruise_data['Station'].map(stn2yutm)
-    cruise_data.rename(columns={'Temperature (Degrees Celsius)':'Temperature'}, inplace=True)
-    
+    ############## put the light extinction data into a dataframe with correct format for the interpolator ###############
+
+    # we want to average secchidepth (which is proportional to the photic depth) 
+    # across the whole simulation period at each station... 
+    light_data = light_data[['time','Station','x','y','secchidepth']]
+    data1 = pd.DataFrame(columns=['Station','x','y','secchidepth','npts'])
+    for station in np.unique(light_data['Station']):
+        ind = light_data['Station'] == station
+        data_append = light_data.loc[ind][['Station','x','y','secchidepth']].mean(axis=0)
+        data_append['npts'] = np.sum(ind)
+        data1.loc[len(data1)] = data_append
+    data1 = data1[['x','y','secchidepth','npts']]
+
     ############## put the cruise data into a dataframe with correct format for the interpolator #########################
     
     # initialize a master dataframe that will hold depth-averaged cruise data along with the ROMS data
@@ -206,6 +242,11 @@ def make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir):
                            'y' : 'float',
                            'Temperature' : 'float',
                            'Salinity' : 'float'})
+
+    data1 = data1.astype( dtype={'x' : 'float',
+                           'y' : 'float',
+                           'secchidepth' : 'float',
+                           'npts' : 'int'})
     
     # load the grid, get the cell center coordinates 
     grid = unstructured_grid.UnstructuredGrid.read_dfm(grid_fn,cleanup=True)
@@ -276,10 +317,60 @@ def make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir):
                       'data points in same spatial location at different times, they write on\n' + 
                       'top of each other. Just trying to do a reality check, not make a perfect plot'))
         plt.tight_layout()
-        fig.savefig('%s_initial_condition.png' % value_col)
+        fig.savefig(os.path.join(abs_bc_dir,'%s_initial_condition.png' % value_col))
     
         # finally, write the initial condition!!!
         out_fn = os.path.join(abs_bc_dir, '%s-topini.xyz' % value_col)
+        print('writing %s ...' % out_fn)
+        with open(out_fn, 'wt+') as f:
+    
+            for i in range(len(ongrid)):
+    
+                f.write('%16.7f%16.7f%16.7f\n' % (xg[i], yg[i], ongrid[i]))
+
+    # make the file for secchidepth
+    for value_col in ['secchidepth']:
+    
+        # here's where we apply Rusty's widget to interpolate as the fish swims, with some kind of weighting in time
+        # data2d maps to the grid cell centers
+        time_int = data1.copy()
+        time_int['weight'] = 1
+        smooth = interp_4d.weighted_grid_extrapolation(grid, time_int, alpha=alpha, value_col=value_col)
+        assert np.all(np.isfinite(smooth)),"Error -- getting some non-finite values"
+        
+        # now we need to interpolate onto the regular grid xg, yg
+        ongrid = griddata(xy, smooth, (xg, yg), method='linear')
+    
+        # linear method doesn't extrapolate, so use nearest neighbor method to fill in nan's
+        ongrid_nn = griddata(xy, smooth, (xg, yg), method='nearest')
+        ind = np.isnan(ongrid)
+        ongrid[ind] = ongrid_nn[ind]
+    
+        # find max and min for colorbar
+        cmin = np.min(ongrid)
+        cmax = np.max(ongrid)
+    
+        # now plot the gridded interpolated field along with the data used to generate it 
+        # (note not all of the cruise data is used, only data close enough in time)
+        fig, ax = plt.subplots(figsize=(11.5, 8))
+        sc = ax.scatter(xg, yg, s=10, c=ongrid, cmap='jet', vmin=cmin, vmax=cmax)
+        cb = plt.colorbar(sc)
+        cb.set_label(value_col)
+        ax.axis('off')
+    
+        # add the input data
+        ax.scatter(time_int['x'], time_int['y'], s=200, c=time_int[value_col], cmap='jet', vmin=cmin, vmax=cmax)
+        for i in range(len(time_int)):
+            time_int1 = time_int.loc[i]
+            ax.text(time_int1['x'], time_int1['y'], '%d' % time_int1['npts'], ha='center', va='center')
+        
+        # save plot
+        ax.set_title('%s (small dots) shown with input data (large dots)\nnumber of cruises in time average is shown in center of large dot' % value_col)
+        plt.tight_layout()
+        fig.savefig(os.path.join(abs_bc_dir,'%s_xyz.png' % value_col))
+    
+        # finally, write the initial condition!!!
+        out_fn = os.path.join(abs_bc_dir, '%s.xyz' % value_col)
         print('writing %s ...' % out_fn)
         with open(out_fn, 'wt+') as f:
     

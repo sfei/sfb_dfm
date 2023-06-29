@@ -63,10 +63,9 @@ Now you have most of the pieces in place to set up the run. You should take a mo
 	c) check that the precipitation/evaporation data from CIMIS station 171 in Union City includes the simulation period. the input file is here:
 			/boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/sfb_dfm/sfbay_cimis/union_city-hourly.nc
 	if you need to, you can use the scripts in the same folder as this netcdf file to download more data and suck it into the input file. note rusty had this happending automatically but we made it a bit more manual because of major bugginess involved in the automation
-    d) to create the salinity and temperature initial condition, we need data from the USGS Peterson Cruise. go to the following website: 
+    d) to create the salinity and temperature initial condition, and to create a spatially varying secchidepth (for the heat model) we need data from the USGS Peterson Cruise. go to the following website: 
 			https://sfbay.wr.usgs.gov/water-quality-database/
-    and download data that spans either side of the start date of the simulation by 15 days. if for some odd reason you are launching a run near Jan 1, download two years of data and just splice them together by hand. 
-	the file you download will be called wqdata.csv. upload this file to the following folder so sfb_dfm can find it:
+    and download data starting from 15 days before the start date of the simulation through the end of the simulation. for a typical single water year simulation, that means downloading data for two calendar years spanning the water year. multiple years of data need to be spliced together by hand. the spliced file should be named wqdata.csv. upload this file to the following folder so sfb_dfm can find it:
 			/boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/sfb_dfm/inputs-static/
 	make sure to change the permissions so sfb_dfm can read it:
 			cd /boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/sfb_dfm/inputs-static/

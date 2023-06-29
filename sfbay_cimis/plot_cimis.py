@@ -1,24 +1,18 @@
 import xarray as xr
-import matplotlib.pyplt as plt
+import matplotlib.pylab as plt
 
 ## 
 
-df=xr.open_dataset('union_city-hourly-2001-2016.nc')
+dat=xr.open_dataset('union_city-hourly.nc')
 
 ## 
+fig, ax = plt.subplots(3,1,figsize=(20,12))
 
-plt.figure(1).clf()
+for i,col in enumerate(['HlyPrecip', 'HlyEto', 'HlySolRad']):
 
-fig,ax=plt.subplots(num=1)
+	ax[i].plot(dat['time'],dat[col].values)
+	ax[i].set_ylabel(col + ' ' + dat[col].units)
 
-ax.plot(df.time,df['HlySolRad'])
+ax[0].set_title('Union City CIMIS')
 
-dnums=utils.to_dnum(df.time.values)
-
-## 
-
-# True daily averages:
-daily_rad =df['HlySolRad'].values.reshape([-1,24]).mean(axis=1)
-daily_dnum=dnums.reshape([-1,24]).mean(axis=1)
-
-ax.plot(daily_dnum,daily_rad,color='orange',lw=3)
+fig.savefig('union_city-hourly.png')

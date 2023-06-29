@@ -144,15 +144,7 @@ adjusted_pli_fn = os.path.join(base_dir,'nudged_features.pli')
 
 # this line worked in emma's repo that she left on hpc because, but since she cloned rusty's 
 # sfb_dfm_repo he made updates to add_sfbay_freshwater, so changing to work with rusty's updated 
-# sfb_dfm_utils (alliek dec 2020)
-#sfb_dfm_utils.add_sfbay_freshwater(bc_dir,
-#                                   run_start,run_stop,ref_date,
-#                                   adjusted_pli_fn,
-#                                   freshwater_dir=os.path.join(base_dir, 'sfbay_freshwater'),
-#                                   grid=grid,
-#                                   dredge_depth=dredge_depth,
-#                                   old_bc_fn=old_bc_fn,
-#                                   all_flows_unit=ALL_FLOWS_UNIT)          
+# sfb_dfm_utils (alliek dec 2020)     
 sfb_dfm_utils.add_sfbay_freshwater(mdu,
                          str(rel_bc_dir), # added rel_bc_dir alliek dec 2020
                          str(adjusted_pli_fn),
@@ -179,13 +171,6 @@ potw_dir  =  os.path.join(base_dir,'sfbay_potw')
 
 # this line worked in emma's hpc repo but rusty made updates since then, so changing to 
 # work with rusty's updated sfb_dfm_utils
-#sfb_dfm_utils.add_sfbay_potw(src_dir,
-#                             run_start,run_stop,ref_date,
-#                             potw_dir,
-#                             adjusted_pli_fn,
-#                             grid,dredge_depth,
-#                             old_bc_fn,
-#                             all_flows_unit=ALL_FLOWS_UNIT)
 sfb_dfm_utils.add_sfbay_potw(mdu, 
                              rel_src_dir, # added rel_src_dir alliek dec 2020
                              potw_dir, 
@@ -260,7 +245,11 @@ if 1:  # Copy grid file into run directory and update mdu
     dfm_grid.write_dfm(grid, str(dest) , overwrite=True)
 
 # prior to adding initial salinity to the external forcing, we have to generate it!!!
-sfb_dfm_utils.make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir)
+# in july 2023 added secchidepth to this function ... note that secchidepth is actually 
+# not an initial condition, but dfm doesn't allow it to vary in time, so it has the same 
+# xyz format, and it's based on the same usgs cruise dataset as the initial salinity and temperature,
+# so i added it here
+sfb_dfm_utils.make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir)
 
 
 # update to work with rusty's changes to sfb_dfm_utils
@@ -268,7 +257,7 @@ sfb_dfm_utils.make_initial_sal_temp(run_start, abs_init_dir, abs_bc_dir)
 #                                       abs_static_dir,
 #                                       mdu,
 #                                       run_start)
-# altered by Allie to use updated initial salinity and also temperature!!!
+# altered by Allie to use updated initial salinity and also temperature!!! and secchidepth too now
 sfb_dfm_utils.add_initial_salinity(run_base_dir,
                                    abs_static_dir, 
                                    abs_bc_dir, # added by allie
@@ -299,7 +288,7 @@ if 1:
     
     with open( os.path.join(run_base_dir,obs_fn),'wt') as fp:
         for idx,row in enumerate(obs_pnts):
-            xy = np.array(row['geom'])
+            xy = np.array([row['geom'].x,row['geom'].y])
             fp.write("%12g %12g '%s'\n"%(xy[0], xy[1], row['name']))
     mdu['output','ObsFile'] = obs_fn
 

@@ -57,6 +57,12 @@ def add_sfbay_potw(mdu,
                 six.print_("(skip %s) "%site_s,end="")
                 continue
 
+            if np.isnan(potw.utm_x.values.mean()):
+                # Delta POTWs are in this file, too, but not in this
+                # grid.  Luckily they are easy to identify based on
+                # x coordinate.
+                six.print_("(skip %s -- coordinates are nan) "%site_s,end="")
+                continue
             if potw.utm_x.values.mean() > 610200:
                 # Delta POTWs are in this file, too, but not in this
                 # grid.  Luckily they are easy to identify based on
@@ -123,7 +129,7 @@ def add_sfbay_potw(mdu,
                 dio.write_pli(pli_fp,[feat])
 
                 dredge_grid.dredge_discharge(grid,feat[1],dredge_depth)
-
+                
             with open(os.path.join(run_base_dir,rel_src_dir,'%s.tim'%site_s),'wt') as tim_fp: # added rel_src_dir alliek dec 2020
                 for tidx in time_idxs:
                     tstamp_minutes = (potw.time[tidx]-ref_date) / np.timedelta64(1,'m')

@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import xarray as xr
+import pandas as pd
 
 import stompy.model.delft.io as dio
 from stompy import utils
@@ -16,7 +17,7 @@ from . import dredge_grid
 # Sea_0001.pli - 
 
 
-def add_delta_inflow(mdu,
+def add_delta_inflow(mdu, base_dir,
                      rel_bc_dir,
                      static_dir,
                      grid,dredge_depth,
@@ -112,12 +113,10 @@ def add_delta_inflow(mdu,
                     # Write the data:
                     if quant=='dischargebnd':
                         da=source.stream_flow_mean_daily
+                        da.values[:] *= 0.028316847 
                         da2=utils.fill_tidal_data(da)
                         if all_flows_unit:
-                            da2.values[:]=1.0
-                        else:
-                            # convert ft3/s to m3/s
-                            da2.values[:] *= 0.028316847 
+                            da2.values[:]=1.0 
                     elif quant=='salinitybnd':
                         da2=source.stream_flow_mean_daily.copy(deep=True)
                         da2.values[:]=0.0
@@ -144,10 +143,13 @@ def add_delta_inflow(mdu,
                         tim_fn=os.path.join(run_base_dir,rel_bc_dir,node_name+".tim")
                         df.to_csv(tim_fn, sep=' ', index=False, header=False, columns=columns)
 
-            if temp_logical[i]==False:
+
+
+            elif temp_logical[i]==False:
                 # Add stanzas to FlowFMold_bnd.ext:
                 for quant,suffix in [('dischargebnd','_flow'),
-                                     ('salinitybnd','_salt')]:
+                                     ('salinitybnd','_salt'),
+                                     ('temperaturebnd','_temp')]:
                     with open(old_bc_fn,'at') as fp:
                         lines=["QUANTITY=%s"%quant,
                                "FILENAME=%s/%s%s.pli"%(rel_bc_dir,src_name,suffix),
@@ -164,15 +166,31 @@ def add_delta_inflow(mdu,
                     # Write the data:
                     if quant=='dischargebnd':
                         da=source.stream_flow_mean_daily
+                        da.values[:] *= 0.028316847 
                         da2=utils.fill_tidal_data(da)
                         if all_flows_unit:
-                            da2.values[:]=1.0
-                        else:
-                            # convert ft3/s to m3/s
-                            da2.values[:] *= 0.028316847 
+                            da2.values[:]=1.0 
                     elif quant=='salinitybnd':
                         da2=source.stream_flow_mean_daily.copy(deep=True)
                         da2.values[:]=0.0
+                    elif quant=='temperaturebnd':
+
+                        # load climatological temperature
+                        df_temp = pd.read_csv(os.path.join(base_dir,'delta_temperature_climatology','Delta_Climatological_Temperature.csv'))
+                        day_0 = df_temp['Decimal Day (UTC)'].values
+                        temp_0 = df_temp['%s Temp (oC)' % src_name].values
+
+                        # dummy data
+                        da2=source.stream_flow_mean_daily.copy(deep=True)
+                        time_1 = da.time.values
+                        years_1 = pd.DatetimeIndex(time_1).year.values
+                        time_1_jan1 = np.array([np.datetime64('%d-01-01' % year) for year in years_1])
+                        day_1 = np.floor((time_1 - time_1_jan1)/np.timedelta64(1,'D'))
+
+                        # interpolate to get temperature
+                        temp_1 = np.interp(day_1, day_0, temp_0)
+
+                        da2.values[:] = temp_1
                             
                     df=da2.to_dataframe().reset_index()
                     df['elapsed_minutes']=(df.time.values - ref_date)/np.timedelta64(60,'s')
@@ -190,4 +208,5 @@ def add_delta_inflow(mdu,
 
                         tim_fn=os.path.join(run_base_dir,rel_bc_dir,node_name+".tim")
                         df.to_csv(tim_fn, sep=' ', index=False, header=False, columns=columns)
+
             i+=1

@@ -3,8 +3,8 @@
 # This script  partitions and executes the DFM run
 
 # User input: 
-RUN_NAME="wy2022"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
-SFB_DFM_PARENT_PATH=/fortcollinsvol1/hpcshared/open_bay/hydro/full_res/wy2022     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export RUN_NAME="wy2022_t140737" # name of the run (this will be name of *.mdu file and folder it's stored in)
+SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2022_t140737     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 NPROC=16                                    # number of processors (16 is a good number)
 DFMV=/opt/software/delft/dfm/r52184-opt/bin # path to DFM binaries
 
@@ -28,9 +28,9 @@ echo ""
 dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_NAME.mdu >partition.txt
 echo ""
 
-# Execute parallel run
-echo "Executing DFM run, check "$RUN_DIR"/out.txt and "$RUN_DIR"/err.txt for status"
-echo ""
-mpiexec -n $NPROC dflowfm --autostartstop $RUN_NAME.mdu > out.txt 2> err.txt
-echo ""
+## Execute parallel run
+#echo "Executing DFM run, check "$RUN_DIR"/out.txt and "$RUN_DIR"/err.txt for status"
+#echo ""
+#mpiexec -n $NPROC dflowfm --autostartstop $RUN_NAME.mdu > out.txt 2> err.txt
+#echo ""
 

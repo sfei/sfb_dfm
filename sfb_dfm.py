@@ -186,19 +186,21 @@ sfb_dfm_utils.add_sfbay_potw(mdu,
 # not sure but I beleive the following logical indices help to deal with missing temperature
 # data at jersey point after 1/11/2016. this is from changes emma made to delta_inflows.py in
 # sfb_dfm_utils
-temp_jersey = run_start>np.datetime64('2009-12-01')<run_stop<np.datetime64('2016-11-01')
-temp_rio    = run_start>np.datetime64('2010-01-01')<run_stop<np.datetime64('2020-01-20')
+#temp_jersey = run_start>np.datetime64('2009-12-01')<run_stop<np.datetime64('2016-11-01')
+#temp_rio    = run_start>np.datetime64('2010-01-01')<run_stop<np.datetime64('2020-01-20')
+
 # Delta boundary conditions
 # saved over rusty's delta_inflow.py with emma's version but then changed to be more like rusty's 
 # for better handling of boundary condition directory
-sfb_dfm_utils.add_delta_inflow(mdu,
-                               rel_bc_dir,
+sfb_dfm_utils.add_delta_inflow(mdu, 
+                               base_dir = base_dir,
+                               rel_bc_dir = rel_bc_dir,
                                static_dir = abs_static_dir,
                                grid = grid,
                                dredge_depth = dredge_depth,
                                all_flows_unit = ALL_FLOWS_UNIT,
-                               temp_jersey = temp_jersey,
-                               temp_rio = temp_rio)
+                               temp_jersey = False,
+                               temp_rio = False)
 ##
 
 

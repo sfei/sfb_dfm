@@ -3,8 +3,8 @@
 # This script  partitions and executes the DFM run
 
 # User input: 
-export RUN_NAME="wy2022_t140737" # name of the run (this will be name of *.mdu file and folder it's stored in)
-SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2022_t140737     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export RUN_NAME="wy2022_r52184" # name of the run (this will be name of *.mdu file and folder it's stored in)
+SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2022_r52184     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 NPROC=16                                    # number of processors (16 is a good number)
 DFMV=/opt/software/delft/dfm/r52184-opt/bin # path to DFM binaries
 

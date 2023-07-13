@@ -4,10 +4,14 @@
 # I ran this script in the the delft_env anaconda environment on chicago,
 # enter this at command line to activate: "conda activate delft_env"
 
+RUN_NAME="wy2022_r52184"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
+SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2022_r52184     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+
+
 # user sets these variables
-runname='wy2022_bloom_16layer'
-runpath_fr='/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2022_bloom/runs/'
-runpath_ag='/chicagovol1/hpcshared/open_bay/hydro/agg/'
+runname='wy2022_r52184'
+runpath_fr='/boisevol1/hpcshared/open_bay/hydro/full_res/wy2022_r52184/runs/'
+runpath_ag='/boisevol1/hpcshared/open_bay/hydro/agg/'
 shppath='/richmondvol1/hpcshared/Shapefiles/open_bay_agg_grid_hand_drawn/boxes-v02.shp'
 
 # use latest version of stompy ... aggregation script is a single *.py file in the stompy/model/delft directory

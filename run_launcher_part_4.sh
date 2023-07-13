@@ -5,8 +5,8 @@
 # 	(2) add back the missing source flows (bug in this version of the DFM model is that they are left out, violating mass conservation)
 
 # User input: 
-RUN_NAME="wy2011-wy2012"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
-SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2011-wy2012     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+RUN_NAME="wy2022_r52184"                             # name of the run (this will be name of *.mdu file and folder it's stored in)
+SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2022_r52184     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 NPROC=16                                    # number of processors (16 is a good number)
 DDCOUPLEV=/opt/software/delft/ddcouplefm/1.02.01.50002/lnx64 # path to ddcouple, the executable from deltares that stitches dwaq output together
 
@@ -46,5 +46,5 @@ ddcouplefm $RUN_NAME $NPROC
 
 # now that output is coupled, make the mass conservation correction
 echo "Calling sfb_dfm_postprocessor.py to make mass conservation correction at tributary/POTW inflow sites"
-$PPATH $SFB_DFM_PARENT_PATH/sfb_dfm/sfb_dfm_postprocessor.py
+/opt/anaconda3/envs/delft_env/bin/python $SFB_DFM_PARENT_PATH/sfb_dfm/sfb_dfm_postprocessor.py
 

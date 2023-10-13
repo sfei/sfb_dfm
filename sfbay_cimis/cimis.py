@@ -8,6 +8,10 @@ import requests
 import numpy as np
 import xarray as xr
 
+import os, sys
+stompy_path = os.path.join('..','..','stompy')
+if not stompy_path in sys.path:
+    sys.path.append(stompy_path)
 from stompy import utils
 
 ## 
@@ -114,8 +118,8 @@ def cimis_fetch_to_xr(stations, # Union City
 ## 
 
 #2/5/2001 is start of record for union city
-start_date = '2021-01-01'
-end_date = '2022-12-31'
+start_date = '2018-01-01'
+end_date = '2019-12-31'
 
 #period=[np.datetime64('2001-02-01'),
 #        np.datetime64('2022-08-19')]

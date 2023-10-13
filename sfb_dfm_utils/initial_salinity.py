@@ -335,6 +335,7 @@ def make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir):
         # data2d maps to the grid cell centers
         time_int = data1.copy()
         time_int['weight'] = 1
+
         smooth = interp_4d.weighted_grid_extrapolation(grid, time_int, alpha=alpha, value_col=value_col)
         assert np.all(np.isfinite(smooth)),"Error -- getting some non-finite values"
         

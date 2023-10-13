@@ -5,27 +5,43 @@
 ################################################
 
 # specify parameters for this run 
-export RUN_NAME="wy2022_t140737_new_stations" # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2021-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2022-10-01"   # run end time in YYYY-MM-DD format
+export RUN_NAME="wy2019a" # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2018-08-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2019-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-export SFB_DFM_PARENT_PATH=/chicagovol1/hpcshared/open_bay/hydro/full_res/wy2022_t140737     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/fortcollinsvol1/jungwoo/wy2019/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 
 # specify number of processors
 export NPROC=16
 
-# specify path to DFM 
-#export DFM_PATH=/opt/software/delft/dfm/r52184-opt # path to DFM binaries and libraries (bin and lib folders should be inside here) 
-export DFM_PATH=/opt/anaconda3/envs/dfm_t140737/
+# we are using an old anaconda environment for now, need to iron out some bugs
+# so sfb_dfm.py works in newer anaconda environments
+# this is the direct path to python executable:
+export PYTHON=/opt/anaconda3/envs/delft_env/bin/python 
 
-# specify exact location of python and ddcouplefm/waqmerge executables
-export PYTHON=/opt/anaconda3/envs/delft_env/bin/python # path to python executable
+# specify if you want to use the old or new version of the DFM code
+# default should be true as we are still delaying a transfer to the newer version
+# for complicated reasons
+OLDCODE=true
 
-# for the old code, point to ddcouplefm, and for the new code use waqmerge that comes from a newer distribution
-#export DDCOUPLE_PATH=/opt/software/delft/ddcouplefm/1.02.01.50002/lnx64/ # path to ddcouplefm or waqmerge bin and lib directories
-#export DDCOUPLE_NAME=ddcouplefm # this is ddcouplefm for older code and waqmerge for newer code
-export DDCOUPLE_PATH=/opt/software/delft/dfm/t141798/
-export DDCOUPLE_NAME=waqmerge
+# specify path to DFM
+if [ "$OLDCODE" = true ]
+then
+	export DFM_PATH=/opt/software/delft/dfm/r52184-opt/
+else
+	export DFM_PATH=/opt/anaconda3/envs/dfm_t140737/
+
+# here is where you point to the program that stitches together the model output across
+# the different subdomains (16 of them if you use the usual 16 processors). depending if you
+# ran the old or new code, you will need to use ddcouplefm (for the old code) or waqmerge 
+# (for the new code)
+if [ "$OLDCODE" = true ]
+then
+	export DDCOUPLE_PATH=/opt/software/delft/ddcouplefm/1.02.01.50002/lnx64/ 
+	export DDCOUPLE_NAME=ddcouplefm 
+else
+	export DDCOUPLE_PATH=/opt/software/delft/dfm/t141798/
+	export DDCOUPLE_NAME=waqmerge
 
 ###############################################################################################################
 ##### the following don't need to be altered, provided user organizes folders in a certain way (see README.md)

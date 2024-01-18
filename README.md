@@ -45,9 +45,6 @@
         cd /boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/sfb_dfm/
         git clone https://stash.sfei.org/scm/nobm/sfbay_freshwater.git
         git clone https://stash.sfei.org/scm/nobm/sfbay_potw.git 
-    note, if you have some problems with sfbay_potw later on, and your run is for wy2019 or earlier, you might want to try using Emma's older version of the repo:
-        git clone https://github.com/emmashie/sfbay_potw
-    we are currently ironing out some bugs in the repo that is on stash
 		
 Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period! You need to check three things, to start:
 
@@ -105,6 +102,8 @@ The wind and meterological input need to be generated using repositories that li
         cd /boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/wy2005a/
         chmod -R ugo+r *
 
+ 11) if you are running the "old" version of DFM (r52184-opt) you will need to delete the secchidepth parameter from the list of input files, as this parameter is not recognized in the earlier version of the code, and it will crash your simulation. Edit the FlowFMold_bnd.ext file inside the run folder to delete the block of text about secchidepth.
+
 Now we are done with the manual inputs, and we can start the automatic part of the run setup. First, you need to run the python script sfb_dfm.py. This will generate all the remaining input files for your DFlow3D-FM (DFM) run. Next, you need to run DFM on these input files. Finally, if you are planning to use the results of the simulation to run a DWAQ simulation, you are going to need to do two postprocessing steps: first the DWAQ hydro files from the 16 domains in the parallel simulation need to be stitched together, and second, the flow rates coming out of the point sources need to be corrected because the version of DFM we are currently using leaves them out of the DWAQ hydro files. We have created two shell scripts that do all of this for you, but they are very specific to SFEI's servers. If you want to run the model outside SFEI, you will need to find your own way of running sfb_dfm.py, running DFM on your input files, and doing the two postprocessing steps. If you use a newer version of DFM you will not need to correct the point sources, but it doesn't hurt to do that anyway.
 
 Here is how you finally run the model at SFEI: 
@@ -122,6 +121,8 @@ run_launcher_part2.sh partitions the domain and actually runs the DFM solver
 run_launcher_part3.sh stitches together the DWAQ input files, which are split across the multidomains used to parallelize the code
 
 run_launcher_part4.sh makes a correction to the DWAQ input files, needed becasue the discharges from the point sources are missing (this error is corrected in newer versions of DFM)
+
+Finally, to create the aggregated grid hydro input for DWAQ, you can run aggregate_hydro.sh 
 
 
 See Allie's notes about setting up the delft_env anaconda environment here: 

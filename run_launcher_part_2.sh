@@ -4,7 +4,7 @@
 
 
 # USER INPUT: for debugging, we run the code in serial and output to the screen
-DEBUG=false
+DEBUG=true
 
 # set some environment variables, shared across run launchers
 source run_launcher_part_0.sh
@@ -16,9 +16,9 @@ export LD_LIBRARY_PATH=$DFM_PATH/lib:$LD_LIBRARY_PATH
 # change to run directory
 cd $RUN_DIR
 
-if [ "$DEBUG" = true ]
+if [ "$DEBUG" = false ]
 then
-	dflowfm --autostartstop $RUN_NAME.mdu
+	dflowfm --autostartstop $RUN_NAME.mdu > out.txt
 else
 	# Create partitions for parallel run
 	echo "Partitioning into "$NPROC" subdomains, check "$RUN_DIR"/partition.txt for status"

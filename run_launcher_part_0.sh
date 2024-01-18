@@ -5,11 +5,11 @@
 ################################################
 
 # specify parameters for this run 
-export RUN_NAME="wy2019a" # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_NAME="wy2019" # name of the run (this will be name of *.mdu file and folder it's stored in)
 export RUN_START="2018-08-01"  # run start time in YYYY-MM-DD format
 export RUN_STOP="2019-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-export SFB_DFM_PARENT_PATH=/fortcollinsvol1/jungwoo/wy2019/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2019/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 
 # specify number of processors
 export NPROC=16
@@ -30,6 +30,7 @@ then
 	export DFM_PATH=/opt/software/delft/dfm/r52184-opt/
 else
 	export DFM_PATH=/opt/anaconda3/envs/dfm_t140737/
+fi
 
 # here is where you point to the program that stitches together the model output across
 # the different subdomains (16 of them if you use the usual 16 processors). depending if you
@@ -42,6 +43,7 @@ then
 else
 	export DDCOUPLE_PATH=/opt/software/delft/dfm/t141798/
 	export DDCOUPLE_NAME=waqmerge
+fi
 
 ###############################################################################################################
 ##### the following don't need to be altered, provided user organizes folders in a certain way (see README.md)

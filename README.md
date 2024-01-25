@@ -120,7 +120,7 @@ run_launcher_part2.sh partitions the domain and actually runs the DFM solver
 
 run_launcher_part3.sh stitches together the DWAQ input files, which are split across the multidomains used to parallelize the code
 
-run_launcher_part4.sh makes a correction to the DWAQ input files, needed becasue the discharges from the point sources are missing (this error is corrected in newer versions of DFM)
+run_launcher_part4.sh makes a correction to the DWAQ input files, needed becasue the discharges from the point sources are missing (this error is corrected in newer versions of DFM), and also creates a set of DWAQ input files with temperature and salinity capped at maximum values that are specified in run_launcher_part0.sh
 
 Finally, to create the aggregated grid hydro input for DWAQ, you can run aggregate_hydro.sh 
 

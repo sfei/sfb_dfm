@@ -6,17 +6,15 @@
 # set some environment variables, shared across run launchers
 source run_launcher_part_0.sh
 
-# add stompy path
-export PYTHONPATH=$STOMPY_PATH       
-
-# path to *.hyd file, should be based on run path and run name, if not enter whatever is correct
-# this gets passed to the sfb_dfm_postprocessor.py script
-export HYDRO_PATH=$RUN_DIR/DFM_DELWAQ_$RUN_NAME/$RUN_NAME.hyd
-
 # change to run directory
 cd $RUN_DIR
 
 # now that output is coupled, make the mass conservation correction
-echo "Calling sfb_dfm_postprocessor.py to make mass conservation correction at tributary/POTW inflow sites"
-$PYTHON $SFB_DFM_PARENT_PATH/sfb_dfm/sfb_dfm_postprocessor.py
+echo "Calling postprocess_correct_point_source_error.py to make mass conservation correction at tributary/POTW inflow sites"
+$PYTHON $SFB_DFM_PARENT_PATH/sfb_dfm/postprocess_correct_point_source_error.py
+
+# now call the script that bounds the salinity and temperature
+echo "Calling postprocess_cap_salinity_and_temperature.py to place bounds on salinity and temperature in dwaq hydro files"
+$PYTHON $SFB_DFM_PARENT_PATH/sfb_dfm/postprocess_cap_salinity_and_temperature.py
+
 

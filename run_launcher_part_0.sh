@@ -14,6 +14,12 @@ export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2019/ 
 # specify number of processors
 export NPROC=16
 
+# bound the salinity and temperautre in the DWAQ hydro input files
+export MINTEMP=0
+export MAXTEMP=28
+export MINSALT=0
+export MAXSALT=40
+
 # we are using an old anaconda environment for now, need to iron out some bugs
 # so sfb_dfm.py works in newer anaconda environments
 # this is the direct path to python executable:
@@ -51,8 +57,10 @@ fi
 
 # these paths require user to organize folders in a certain way, and to clone stompy into the sfb_dfm parent path folder
 export RUN_DIR=$SFB_DFM_PARENT_PATH/runs/$RUN_NAME   # put run in the run folder
+export HYDRO_PATH=$RUN_DIR/DFM_DELWAQ_$RUN_NAME/$RUN_NAME.hyd
 export SFB_DFM_DIR=$SFB_DFM_PARENT_PATH/sfb_dfm # sfb_dfm should be found here
 export STOMPY_PATH=$SFB_DFM_PARENT_PATH/stompy # stompy should be found here
+export PYTHONPATH=$STOMPY_PATH
 
 
 

@@ -5,11 +5,11 @@
 ################################################
 
 # specify parameters for this run 
-export RUN_NAME="wy2021" # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2020-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2021-10-01"   # run end time in YYYY-MM-DD format
+export RUN_NAME="wy2013-v24" # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2012-08-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2013-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2021/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/boisevol2/hpcshared/open_bay/hydro/full_res/wy2013-v24/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 
 # specify number of processors
 export NPROC=16

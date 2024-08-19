@@ -143,7 +143,6 @@ os.path.exists(abs_bc_dir) or os.makedirs(abs_bc_dir)
 adjusted_pli_fn = os.path.join(base_dir,'nudged_features.pli') 
 
 # copy polygon file to guide parallelization to run directory
-sfei_v20_straightened_part.pol
 shutil.copyfile(os.path.join(abs_static_dir,'sfei_v20_straightened_part.pol'), 
                 os.path.join(run_base_dir,'sfei_v20_straightened_part.pol'))
 

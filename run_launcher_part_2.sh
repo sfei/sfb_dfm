@@ -4,7 +4,7 @@
 
 
 # USER INPUT: for debugging, we run the code in serial and output to the screen
-DEBUG=true
+DEBUG=false
 
 # set some environment variables, shared across run launchers
 source run_launcher_part_0.sh
@@ -16,14 +16,20 @@ export LD_LIBRARY_PATH=$DFM_PATH/lib:$LD_LIBRARY_PATH
 # change to run directory
 cd $RUN_DIR
 
-if [ "$DEBUG" = false ]
+if [ "$DEBUG" = true ]
 then
 	dflowfm --autostartstop $RUN_NAME.mdu > out.txt
 else
 	# Create partitions for parallel run
 	echo "Partitioning into "$NPROC" subdomains, check "$RUN_DIR"/partition.txt for status"
 	echo ""
-	dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_NAME.mdu >partition.txt
+	
+	# this is the usual method
+	#dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_NAME.mdu >partition.txt
+	#dflowfm --partition:ndomains=$NPROC:icgsolver=6:genpolygon=1 $RUN_NAME.mdu >partition.txt
+	dflowfm --partition:icgsolver=6 $RUN_NAME.mdu sfei_v20_straightened_part.pol >partition.txt
+
+	# can't get it to work for straight grid, so supplied polygons
 	echo ""
 	
 	# Execute parallel run

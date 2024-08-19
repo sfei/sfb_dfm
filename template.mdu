@@ -36,8 +36,8 @@ BedlevType        = 4                   # Bathymetry specification
 Blmeanbelow       = -999                # If not -999d0, below this level the cell center bed level is the mean of surrouding net nodes
 Blminabove        = -999                # If not -999d0, above this level the cell center bed level is the min. of surrouding net nodes
 PartitionFile     =                     # Domain partition polygon file *_part.pol for parallel run
-AngLat            = 38                  # Angle of latitude S-N (deg), 0: no Coriolis
-AngLon            = 0                   # Angle of longitude E-W (deg), 0: Greenwich
+AngLat            = 37.652401           # Angle of latitude S-N (deg), 0: no Coriolis
+AngLon            = -122.271816         # Angle of longitude E-W (deg), 0: Greenwich
 Conveyance2D      = -1                  # -1: R=HU,0: R=H, 1: R=A/P, 2: K=analytic-1D conv, 3: K=analytic-2D conv
 Nonlin2D          = 0                   # Non-linear 2D volumes, only used if ibedlevtype=3 and Conveyance2D>=1
 Sillheightmin     = 0.5                 # Weir treatment only if both sills larger than this value (m)

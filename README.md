@@ -46,17 +46,17 @@
         git clone https://stash.sfei.org/scm/nobm/sfbay_freshwater.git
         git clone https://stash.sfei.org/scm/nobm/sfbay_potw.git 
 		
-Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period! You need to check three things, to start:
+Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period. You need to check three things, to start:
 
  6) check input data to make sure it covers simulation period
 	a) check the freshwater inflows file to make sure there are data during the simulation period, e.g.
 			/boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/sfb_dfm/sfbay_freshwater/outputs/sfbay_freshwater.nc
 	this data comes primarily from hydrological models at SFEI. for wy2013-wy2017 the data are based on BAHM, and Emma's notes give an overview of that model here 
 			https://docs.google.com/document/d/1zcmm4JZ3jDb_MAG8dfY-vgInAC1kAH1N76LW4PV8Q5k/edit#heading=h.emy5l0qu2qlh
-	for wy2018-wy2021 we use WDM, and we don't have great documentation for this model yet. talk with Tan Zi (tanz@sfei.org), he's the SFEI hydrological modeler, to get more data!
+	for wy2018-wy2022 we use WDM, and we don't have great documentation for this model yet. talk with Pedro Almodovar, he's the SFEI hydrological modeler, to get more data
 	b) check the POTW inflows file to make sure there are data during the simulation period:
 			/boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/sfb_dfm/sfbay_potw/outputs/sfbay_delta_potw.nc
-    these data come from a variety of sources, and currently the repository is a bit of a mess. Sienna White worked to clean it up and suck in nutrient input data in addition to flows through wy2019. it is less messy now, but the part of Rusty's scripts that used to track the data source is broken. the vast majority of the data are based on reporting by the POTW's in the annual GAR report that Dave Senn gets from Mike Falk. there's about a one year delay between a given water year and the report availability.
+    these data come from a variety of sources, but the vast majority of the data are based on reporting by the POTW's in the annual GAR report that Dave Senn gets from Mike Falk. there's about a one year delay between a given water year and the report availability.
 
     Warning: make sure the file is actually called "sfbay_delta_potw.nc", and not something
     slightly different like sfbay_delta_potw_Aug2022.nc because this is the file name sfb_dfm will look for
@@ -76,17 +76,12 @@ The wind and meterological input need to be generated using repositories that li
  7) generate the wind inputs using the following repository:
         1_Nutrient_Share/2_Data_NUTRIENTS/SFEI_Wind/ 
         (link: https://drive.google.com/drive/folders/1e0GGrld8uqjpnBkHCtsQK4-BVl9e1G3G?usp=share_link)
-    check the README.txt and Documentation folder to learn how this repo works, or skip ahead and just modify and run the python script /SFEI_Wind/Wind4DFlow-SFB-UTC/generate_amu_amv_4SFB.py to generate the input files you need. the files are generated in the same folder as this script, and you can pick the name. if you end up with an empty file, you're going to need to download and process more wind data, and you will have to read about how to do that in the documentation folder. 
+    check the README.txt and Documentation folder to learn how this repo works, or skip ahead and just modify and run the python script /SFEI_Wind/Wind4DFlow-SFB-UTC/generate_amu_amv_4SFB_nearbay_stations_only.py to generate the input files you need. the files are generated in the same folder as this script, and you can pick the name. if you end up with an empty file, you're going to need to download and process more wind data, and you will have to read about how to do that in the documentation folder. note we used to use the file generate_amu_amv_4SFB.py, which used wind from 52 stations around the bay, but in summer 2024 we switched to generate_amu_amv_4SFB_nearbay_stations_only.py which excludes stations that are far from the bay and uses nearest neighbor interpolation instead of linear or natural neighbor, for simplicity. this switch was motivated by improvement of temperature predictions but we did not really properly test whether it improves things, because it was coupled with other changes. nevertheless, it seems like a better idea to only use nearby wind stations and to use a simpler form of interpolation
     
  8) generate the meteorlogical inputs using the following repository:
         1_Nutrient_Share/2_Data_NUTRIENTS/SFEI_Meteo/
         (link: https://drive.google.com/drive/folders/1vph_vQT1CL5BlgomudxDm-58BNfksLQZ?usp=sharing)
-    sorry, there isn't great documentation for this repo but it's pretty simple. a quick overview is that it contains scripts to download shortwave radiation and relative humidity data from the gridMET dataset, and use those data plus air temperature data from our SFEI_Wind repo, to create an atmospheric forcing input file in the format DFM wants. first look in this folder to make sure you have the data you need: 
-       /SFEI_Meteo/Datasets/gridMET/
-    and if you need to download newer data use the metdata_wget.sh shell script (you'll need a terminal emulator to do this on a Windows computer, sorry! once you have the data you need, generate your input file using 
-    this script:
-        /SFEI_Meteo/Meteo4DFlow-SFB-UTC/generate_hac_4SFB_curvilinear.py
-    the files are generated in the same folder as this script, and you can pick the name
+    use the script generate_hac_4SFB_curvilinear_station_data_based.py to generate the hac.tem input file (the meteorological forcing). This script replaces the original air temperature (which was from all 52 wind stations) with air temperatures at NDBC stations only (which are on the water). Also replace relative humidity from the gridmet dataset with relative humidity from a set of CIMIS and ASOS stations that are not on the water but are closest to the water. Finally use CIMIS measurements of shortwave radiation to compute cloudiness instead of the daily gridMET dataset, taking care to line up the daily curves in time since sometimes an offset creates crazy cloudiness values. Use simple nearest neighbor interpolation for all three parameters. The data that feeds into this script is all in the SFEI_Wind repository. Note we updated our meteorlogical forcing in summer 2024, and this drastically improves the temperature predictions in our model. The old approach used air temperatures from all 52 wind stations, and used the gridMET dataset to estimate cloudiness and relative humidity. 
 
   9) upload the wind and meterological forcing files to the following location:
         /run_path/run_folder/runs/run_name/bc_files/
@@ -104,7 +99,7 @@ The wind and meterological input need to be generated using repositories that li
 
  11) if you are running the "old" version of DFM (r52184-opt) you will need to delete the secchidepth parameter from the list of input files, as this parameter is not recognized in the earlier version of the code, and it will crash your simulation. Edit the FlowFMold_bnd.ext file inside the run folder to delete the block of text about secchidepth.
 
-Now we are done with the manual inputs, and we can start the automatic part of the run setup. First, you need to run the python script sfb_dfm.py. This will generate all the remaining input files for your DFlow3D-FM (DFM) run. Next, you need to run DFM on these input files. Finally, if you are planning to use the results of the simulation to run a DWAQ simulation, you are going to need to do two postprocessing steps: first the DWAQ hydro files from the 16 domains in the parallel simulation need to be stitched together, and second, the flow rates coming out of the point sources need to be corrected because the version of DFM we are currently using leaves them out of the DWAQ hydro files. We have created two shell scripts that do all of this for you, but they are very specific to SFEI's servers. If you want to run the model outside SFEI, you will need to find your own way of running sfb_dfm.py, running DFM on your input files, and doing the two postprocessing steps. If you use a newer version of DFM you will not need to correct the point sources, but it doesn't hurt to do that anyway.
+Now we are done with the manual inputs, and we can start the automatic part of the run setup. First, you need to run the python script sfb_dfm.py. This will generate all the remaining input files for your DFlow3D-FM (DFM) run. Next, you need to run DFM on these input files. Finally, if you are planning to use the results of the simulation to run a DWAQ simulation, you are going to need to do two postprocessing steps: first the DWAQ hydro files from the 16 domains in the parallel simulation need to be stitched together, and second, if you are using the old version of the code (r52184-opt), the flow rates coming out of the point sources need to be corrected because this version of DFMleaves them out of the DWAQ hydro files. We have created a series of shell scripts that do all of this for you, but they are very specific to SFEI's servers. If you want to run the model outside SFEI, you will need to find your own way of running sfb_dfm.py, running DFM on your input files, and doing the two postprocessing steps. If you use a newer version of DFM you will not need to correct the point sources, but it doesn't hurt to do that anyway.
 
 Here is how you finally run the model at SFEI: 
 
@@ -123,7 +118,6 @@ run_launcher_part3.sh stitches together the DWAQ input files, which are split ac
 run_launcher_part4.sh makes a correction to the DWAQ input files, needed becasue the discharges from the point sources are missing (this error is corrected in newer versions of DFM), and also creates a set of DWAQ input files with temperature and salinity capped at maximum values that are specified in run_launcher_part0.sh
 
 Finally, to create the aggregated grid hydro input for DWAQ, you can run aggregate_hydro.sh 
-
 
 See Allie's notes about setting up the delft_env anaconda environment here: 
 https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/edit#bookmark=id.j7qlzh3zbl0h)

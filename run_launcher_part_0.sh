@@ -5,11 +5,11 @@
 ################################################
 
 # specify parameters for this run 
-export RUN_NAME="wy2019" # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2018-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2019-10-01"   # run end time in YYYY-MM-DD format
+export RUN_NAME="wy2021" # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2020-08-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2021-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2019/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2021/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 
 # specify number of processors
 export NPROC=16
@@ -28,14 +28,14 @@ export PYTHON=/opt/anaconda3/envs/delft_env/bin/python
 # specify if you want to use the old or new version of the DFM code
 # default should be true as we are still delaying a transfer to the newer version
 # for complicated reasons
-OLDCODE=true
+export OLDCODE=false
 
 # specify path to DFM
 if [ "$OLDCODE" = true ]
 then
 	export DFM_PATH=/opt/software/delft/dfm/r52184-opt/
 else
-	export DFM_PATH=/opt/anaconda3/envs/dfm_t140737/
+	export DFM_PATH=/opt/anaconda3/envs/dfm_t141798opt/
 fi
 
 # here is where you point to the program that stitches together the model output across
@@ -47,7 +47,7 @@ then
 	export DDCOUPLE_PATH=/opt/software/delft/ddcouplefm/1.02.01.50002/lnx64/ 
 	export DDCOUPLE_NAME=ddcouplefm 
 else
-	export DDCOUPLE_PATH=/opt/software/delft/dfm/t141798/
+	export DDCOUPLE_PATH=/opt/anaconda3/envs/dfm_t141798opt/
 	export DDCOUPLE_NAME=waqmerge
 fi
 

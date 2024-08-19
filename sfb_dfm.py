@@ -85,7 +85,7 @@ abs_init_dir = os.path.join(base_dir,'sfb_dfm_utils')
 
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
-net_file = os.path.join(base_dir, 'sfei_v20_net.nc')
+net_file = os.path.join(base_dir, 'sfei_v20_straightened_net.nc')
 
 # No longer using any new-style boundary conditions
 old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
@@ -141,6 +141,11 @@ os.path.exists(abs_bc_dir) or os.makedirs(abs_bc_dir)
 
 # features which have manually set locations for this grid
 adjusted_pli_fn = os.path.join(base_dir,'nudged_features.pli') 
+
+# copy polygon file to guide parallelization to run directory
+sfei_v20_straightened_part.pol
+shutil.copyfile(os.path.join(abs_static_dir,'sfei_v20_straightened_part.pol'), 
+                os.path.join(run_base_dir,'sfei_v20_straightened_part.pol'))
 
 # this line worked in emma's repo that she left on hpc because, but since she cloned rusty's 
 # sfb_dfm_repo he made updates to add_sfbay_freshwater, so changing to work with rusty's updated 
@@ -204,11 +209,11 @@ sfb_dfm_utils.add_delta_inflow(mdu,
 ##
 
 
-# prior to adding the ocean boundary, need to generate the temperature time series
-sfb_dfm_utils.make_ROMS_temp_tim(abs_init_dir,abs_bc_dir,ref_date,run_start,run_stop)
+## prior to adding the ocean boundary, need to generate the temperature time series
+#sfb_dfm_utils.make_ROMS_temp_tim(abs_init_dir,abs_bc_dir,ref_date,run_start,run_stop)
 
-# also copy the ROMS pli file into the bc directory
-shutil.copyfile(os.path.join(abs_static_dir,'sea_temp_ROMS.pli'), os.path.join(abs_bc_dir,'sea_temp_ROMS.pli'))
+## also copy the ROMS pli file into the bc directory
+#shutil.copyfile(os.path.join(abs_static_dir,'sea_temp_ROMS.pli'), os.path.join(abs_bc_dir,'sea_temp_ROMS.pli'))
 
 # This factor seems to be about right for Point Reyes tides
 # to show up at SF with the right amplitude.  Without

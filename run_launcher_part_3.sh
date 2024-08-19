@@ -15,7 +15,9 @@ cd $RUN_DIR
 echo "Running ddcouplefm to splice together DWAQ output across "$NPROC" domains"
 $DDCOUPLE_PATH/bin/$DDCOUPLE_NAME $RUN_NAME".mdu" $NPROC
 
-## now that output is coupled, make the mass conservation correction
-#echo "Calling sfb_dfm_postprocessor.py to make mass conservation correction at tributary/POTW inflow sites"
-#/opt/anaconda3/envs/delft_env/bin/python $SFB_DFM_PARENT_PATH/sfb_dfm/sfb_dfm_postprocessor.py
-
+# now that output is coupled, make the mass conservation correction
+if [ "$OLDCODE" = true ]
+then
+	echo "Calling sfb_dfm_postprocessor.py to make mass conservation correction at tributary/POTW inflow sites"
+	$PYTHON $SFB_DFM_PARENT_PATH/sfb_dfm/sfb_dfm_postprocessor.py
+fi

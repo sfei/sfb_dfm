@@ -22,7 +22,7 @@ def fill_data(da):
         log.warning("%s: gaps up to %.1f minutes"%(da.name, dt_gap/np.timedelta64(60,'s')))
     da.values = utils.fill_invalid(da.values)    
 
-def add_ocean(run_base_dir,rel_bc_dir,
+def add_ocean(run_base_dir,
               run_start,run_stop,ref_date,
               static_dir,
               grid,old_bc_fn,
@@ -54,38 +54,15 @@ def add_ocean(run_base_dir,rel_bc_dir,
         else:
             tide_gage="9415020" # Pt Reyes 
 
-        if common.cache_dir is None: 
-            tides_raw_fn=os.path.join(run_base_dir,rel_bc_dir,'tides-%s-raw.nc'%tide_gage)
-            if not os.path.exists(tides_raw_fn):
-                tides=noaa_coops.coops_dataset(tide_gage,
+        tides_raw_fn=os.path.join(run_base_dir,'tides-%s-raw.nc'%tide_gage)
+        if not os.path.exists(tides_raw_fn):
+            tides_raw=noaa_coops.coops_dataset(tide_gage,
                                                run_start-pad_time,run_stop+pad_time,
-                                               ["water_level"],
+                                               ["water_level","water_temperature"],
                                                days_per_request=30)
-                # forget about water temperature
-                #tides=noaa_coops.coops_dataset(tide_gage,
-                #                               run_start-pad_time,run_stop+pad_time,
-                #                               ["water_level","water_temperature"],
-                #                               days_per_request=30)
-                tides.to_netcdf(tides_raw_fn,engine='scipy')
-            else:
-                tides=xr.open_dataset(tides_raw_fn)
-        else:
-            # rely on caching within noaa_coops
-            tides=noaa_coops.coops_dataset(tide_gage,
-                                           run_start-pad_time,run_stop+pad_time,
-                                           ["water_level"],
-                                           days_per_request='M',
-                                           cache_dir=common.cache_dir)
-            # forget about water temperature
-            #tides=noaa_coops.coops_dataset(tide_gage,
-            #                               run_start-pad_time,run_stop+pad_time,
-            #                               ["water_level","water_temperature"],
-            #                               days_per_request='M',
-            #                               cache_dir=common.cache_dir)
-    # Those retain station as a dimension of length 1 - drop that dimension
-    # here:
-    tides=tides.isel(station=0)
-    
+
+            tides_raw.to_netcdf(tides_raw_fn,engine='scipy')
+
     # Fort Point mean tide range is 1.248m, vs. 1.193 at Point Reyes.
     # apply rough correction to amplitude.
     # S2 phase 316.2 at Pt Reyes, 336.2 for Ft. Point.
@@ -102,6 +79,8 @@ def add_ocean(run_base_dir,rel_bc_dir,
 
     if 1:
         # Clean that up, fabricate salinity
+        tides=xr.open_dataset(tides_raw_fn).isel(station=0)
+
         water_level=utils.fill_tidal_data(tides.water_level)
 
         # IIR butterworth.  Nicer than FIR, with minor artifacts at ends
@@ -128,13 +107,13 @@ def add_ocean(run_base_dir,rel_bc_dir,
                     # Adjust time base directly.
                     water_level.time.values[:] = water_level.time.values + np.timedelta64(lag_seconds,'s')
             
-        #if 'water_temperature' not in tides:
-        #    log.warning("Water temperature was not found in NOAA data.  Will use constant 15")
-        #    water_temp=15+0*tides.water_level
-        #    water_temp.name='water_temperature'
-        #else:
-        #    fill_data(tides.water_temperature)
-        #    water_temp=tides.water_temperature
+        if 'water_temperature' not in tides:
+            log.warning("Water temperature was not found in NOAA data.  Will use constant 15")
+            water_temp=15+0*tides.water_level
+            water_temp.name='water_temperature'
+        else:
+            fill_data(tides.water_temperature)
+            water_temp=tides.water_temperature
                                              
         if all_flows_unit:
             print("-=-=-=- USING 35 PPT WHILE TESTING! -=-=-=-")
@@ -143,18 +122,6 @@ def add_ocean(run_base_dir,rel_bc_dir,
             salinity=33 + 0*water_level
         salinity.name='salinity'
             
-    if 1: # allie replaced old point reyes temperatures with ROMS climatalogical temperatures
-        src_name ='sea_temp_ROMS' 
-        src_feat=dio.read_pli(os.path.join(static_dir,'%s.pli'%src_name))[0]
-        with open(old_bc_fn,'at') as fp:
-            lines=["QUANTITY=%s"%'temperaturebnd',
-                   "FILENAME=%s/%s.pli"%(rel_bc_dir,src_name),
-                   "FILETYPE=9",
-                   "METHOD=3",
-                   "OPERAND=O",
-                   ""]
-            fp.write("\n".join(lines))
-
     if 1: # Write it all out
         # Add a stanza to FlowFMold_bnd.ext:
         src_name='Sea'
@@ -162,13 +129,13 @@ def add_ocean(run_base_dir,rel_bc_dir,
         src_feat=dio.read_pli(os.path.join(static_dir,'%s.pli'%src_name))[0]
         
         forcing_data=[('waterlevelbnd',water_level,'_ssh'),
-                      ('salinitybnd',salinity,'_salt')]
-                      #('temperaturebnd',water_temp,'_temp')] ###forget about water temp, did that above
+                      ('salinitybnd',salinity,'_salt'),
+                      ('temperaturebnd',water_temp,'_temp')]
 
         for quant,da,suffix in forcing_data:
             with open(old_bc_fn,'at') as fp:
                 lines=["QUANTITY=%s"%quant,
-                       "FILENAME=%s/%s%s.pli"%(rel_bc_dir,src_name,suffix),
+                       "FILENAME=%s%s.pli"%(src_name,suffix),
                        "FILETYPE=9",
                        "METHOD=3",
                        "OPERAND=O",
@@ -176,7 +143,7 @@ def add_ocean(run_base_dir,rel_bc_dir,
                 fp.write("\n".join(lines))
 
             feat_suffix=dio.add_suffix_to_feature(src_feat,suffix)
-            dio.write_pli(os.path.join(run_base_dir,rel_bc_dir,'%s%s.pli'%(src_name,suffix)),
+            dio.write_pli(os.path.join(run_base_dir,'%s%s.pli'%(src_name,suffix)),
                           [feat_suffix])
 
             # Write the data:
@@ -195,50 +162,5 @@ def add_ocean(run_base_dir,rel_bc_dir,
                 if not node_name:
                     node_name="%s%s_%04d"%(src_name,suffix,1+node_idx)
 
-                tim_fn=os.path.join(run_base_dir,rel_bc_dir,node_name+".tim")
+                tim_fn=os.path.join(run_base_dir,node_name+".tim")
                 df.to_csv(tim_fn, sep=' ', index=False, header=False, columns=columns)
-
-def make_ROMS_temp_tim(abs_init_dir,abs_bc_dir,ref_date,run_start,run_stop):
-
-    ''' added by allie to make ocean temperautre boundary condition from roms climatalogical data,
-    copying the approach of the cascade delta model ... this probably does not work correctly with the 
-    ALL_FLOWS_UNIT flag'''
-
-    ## reference, start, and end time of the simulation
-    #ref_date = np.datetime64('2003-08-01')
-    #run_start = np.datetime64('2003-08-01')
-    #run_stop = np.datetime64('2004-10-01')
-    
-    # units for *.tim file times
-    units = 'm' # minutes
-    
-    # daily time step seems fine
-    deltat = np.timedelta64(1,'D').astype(units)
-    
-    # create the time axis
-    time = np.arange(run_start,run_stop+deltat,deltat)
-    
-    # convert time to day of year, since that's what the ROMS data is referenced to
-    year = np.array(pd.DatetimeIndex(time).year)
-    day = np.zeros(len(time))
-    for it in range(len(day)):
-        day[it] = (time[it] - np.datetime64('%d-01-01' % year[it]))/np.timedelta64(1,'D')
-    
-    # read ROMS data
-    data = xr.open_dataset(os.path.join(abs_init_dir,'..','inputs-static','sea_temp_ROMS.nc'))
-    
-    # convert time axis to time in units of tim file
-    time_units = (time - ref_date)/np.timedelta64(1,units)
-    
-    # for each station, interpolate data onto time axis and write to tim file
-    for st in range(1,7):
-        data1 = data.sel(station=st)
-        temp = np.interp(day, data1.time.values, data1.temperature.values)
-        
-        outfn = os.path.join(abs_bc_dir,'sea_temp_ROMS_000%d.tim' % st)
-        with open(outfn, 'wt+') as f:
-            print('writing %s' % outfn)
-            for i in range(len(time_units)):
-                f.write('%0.1f %0.4f\n' % (time_units[i], temp[i]))
-    
-    

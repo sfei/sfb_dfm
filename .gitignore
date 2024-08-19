@@ -4,5 +4,4 @@ sfb_dfm_utils/cache
 sfbay_potw/
 sfbay_freshwater/
 *.png
-sfei_v20_*_net.nc
 DFM_interpreted_idomain_sfei_v*_net.nc

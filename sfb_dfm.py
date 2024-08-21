@@ -25,6 +25,7 @@ from pathlib import Path
 import sys
 import stompy.model.delft.io as dio
 from stompy.model.delft import dfm_grid
+from stompy.grid import unstructured_grid # added by alliek august 2024
 from stompy.spatial import wkb2shp
 from stompy.io.local import usgs_nwis,noaa_coops
 from stompy import utils
@@ -92,7 +93,7 @@ old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
 obs_shp_fn = os.path.join(abs_static_dir ,'observation-points.shp')
 
 # path to grid boundary shapefile
-grid_boundary_fn = os.path.join(base_dir, 'derived', 'grid-boundary.shp')
+grid_boundary_fn = os.path.join(base_dir, 'derived', 'sfei_v20_straightened_net_OUTLINE.shp')
 
 # path to cimis input file
 cimis_fn = os.path.join(base_dir,'sfbay_cimis','union_city-hourly.nc')
@@ -132,7 +133,8 @@ mdu['external forcing','ExtForceFile'] = old_bc_fn
 # Load the grid now -- it's used for clarifying some inputs, but
 # is also modified to deepen areas near inflows, before being written
 # out near the end of the script
-grid = dfm_grid.DFMGrid(str(net_file)) 
+#grid = dfm_grid.DFMGrid(str(net_file)) 
+grid = unstructured_grid.UnstructuredGrid.read_dfm(str(net_file)) # alliek update to ugrid august 2024
     
 ## split into relative and absolute directories (alliek Dec 2020)
 rel_bc_dir = 'bc_files'
@@ -246,9 +248,11 @@ if 1:
 
 if 1:  # Copy grid file into run directory and update mdu
     mdu['geometry','NetFile'] = net_file
-    dest = os.path.join(run_base_dir, mdu['geometry','NetFile'])
-    # write out the modified grid
-    dfm_grid.write_dfm(grid, str(dest) , overwrite=True)
+    
+    # alliek commented out august 2024:
+    #dest = os.path.join(run_base_dir, mdu['geometry','NetFile'])
+    ## write out the modified grid
+    #dfm_grid.write_dfm(grid, str(dest) , overwrite=True)
 
 # prior to adding initial salinity to the external forcing, we have to generate it!!!
 # in july 2023 added secchidepth to this function ... note that secchidepth is actually 

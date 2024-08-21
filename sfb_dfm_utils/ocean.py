@@ -22,7 +22,7 @@ def fill_data(da):
         log.warning("%s: gaps up to %.1f minutes"%(da.name, dt_gap/np.timedelta64(60,'s')))
     da.values = utils.fill_invalid(da.values)    
 
-def add_ocean(run_base_dir,
+def add_ocean(run_base_dir,rel_bc_dir,
               run_start,run_stop,ref_date,
               static_dir,
               grid,old_bc_fn,
@@ -54,7 +54,7 @@ def add_ocean(run_base_dir,
         else:
             tide_gage="9415020" # Pt Reyes 
 
-        tides_raw_fn=os.path.join(run_base_dir,'tides-%s-raw.nc'%tide_gage)
+        tides_raw_fn=os.path.join(run_base_dir,rel_bc_dir,'tides-%s-raw.nc'%tide_gage)
         if not os.path.exists(tides_raw_fn):
             tides_raw=noaa_coops.coops_dataset(tide_gage,
                                                run_start-pad_time,run_stop+pad_time,
@@ -135,7 +135,7 @@ def add_ocean(run_base_dir,
         for quant,da,suffix in forcing_data:
             with open(old_bc_fn,'at') as fp:
                 lines=["QUANTITY=%s"%quant,
-                       "FILENAME=%s%s.pli"%(src_name,suffix),
+                       "FILENAME=%s/%s%s.pli"%(rel_bc_dir,src_name,suffix),
                        "FILETYPE=9",
                        "METHOD=3",
                        "OPERAND=O",
@@ -143,7 +143,7 @@ def add_ocean(run_base_dir,
                 fp.write("\n".join(lines))
 
             feat_suffix=dio.add_suffix_to_feature(src_feat,suffix)
-            dio.write_pli(os.path.join(run_base_dir,'%s%s.pli'%(src_name,suffix)),
+            dio.write_pli(os.path.join(run_base_dir,rel_bc_dir,'%s%s.pli'%(src_name,suffix)),
                           [feat_suffix])
 
             # Write the data:
@@ -162,5 +162,5 @@ def add_ocean(run_base_dir,
                 if not node_name:
                     node_name="%s%s_%04d"%(src_name,suffix,1+node_idx)
 
-                tim_fn=os.path.join(run_base_dir,node_name+".tim")
+                tim_fn=os.path.join(run_base_dir,rel_bc_dir,node_name+".tim")
                 df.to_csv(tim_fn, sep=' ', index=False, header=False, columns=columns)

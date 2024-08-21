@@ -5,7 +5,7 @@ from stompy import utils
 import stompy.model.delft.io as dio
 import six
 
-from . import dredge_grid
+#from . import dredge_grid
 
 DAY=np.timedelta64(1,'D')
 
@@ -98,6 +98,7 @@ def add_sfbay_potw(mdu,
                         # (to allow for some rounding in the ascii round-trip.)
                         offset=utils.dist( adj_feat[1][-1][:2] - feat[1][-1][:2] )
                         if offset > 10.0:
+
                             # Just add on the extra point - but may have to promote one 
                             # or the other to 3D.
                             old_geo=feat[1]
@@ -128,7 +129,10 @@ def add_sfbay_potw(mdu,
 
                 dio.write_pli(pli_fp,[feat])
 
-                dredge_grid.dredge_discharge(grid,feat[1],dredge_depth)
+                # removed by alliek august 2024, doesn't work with new ugrid
+                # format, and our updated grid already has dredged boundaries
+                # to -0.5m so it is unnecessary to update at this time
+                #dredge_grid.dredge_discharge(grid,feat[1],dredge_depth)
                 
             with open(os.path.join(run_base_dir,rel_src_dir,'%s.tim'%site_s),'wt') as tim_fp: # added rel_src_dir alliek dec 2020
                 for tidx in time_idxs:

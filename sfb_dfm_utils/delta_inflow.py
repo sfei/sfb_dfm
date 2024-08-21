@@ -7,7 +7,7 @@ import stompy.model.delft.io as dio
 from stompy import utils
 from stompy.io.local import usgs_nwis
 
-from . import dredge_grid
+#from . import dredge_grid
 
 # copied Silvia's pli files to inputs-static
 # even though there are 14 of these, one per node of the sea boundary,
@@ -90,7 +90,11 @@ def add_delta_inflow(mdu, base_dir,
         for src_name,source in [ ('Jersey',jersey_raw),
                                  ('RioVista',rio_vista_raw)]:
             src_feat=dio.read_pli(os.path.join(static_dir,'%s.pli'%src_name))[0]            
-            dredge_grid.dredge_boundary(grid,src_feat[1],dredge_depth)
+            
+            # removed by alliek august 2024, doesn't work with new ugrid
+            # format, and our updated grid already has dredged boundaries
+            # to -0.5m so it is unnecessary to update at this time
+            #dredge_grid.dredge_boundary(grid,src_feat[1],dredge_depth)
 
             if temp_logical[i]==True:
                 # Add stanzas to FlowFMold_bnd.ext:

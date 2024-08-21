@@ -7,7 +7,8 @@ import stompy.model.delft.io as dio
 from stompy import utils, filters
 from stompy.io.local import usgs_nwis
 
-from . import dredge_grid, common
+#from . import dredge_grid, common
+from . import common
 
 
 DAY=np.timedelta64(86400,'s') # useful for adjusting times
@@ -124,7 +125,10 @@ def add_sfbay_freshwater(mdu,
                     pli_fn=os.path.join(run_base_dir,rel_bc_dir,"%s%s.pli"%(src_name,suffix)) # added rel_bc_dir alliek dec 2020
                     dio.write_pli(pli_fn,[feat_suffix])
 
-                dredge_grid.dredge_boundary(grid,mowry_feat[1],dredge_depth)
+                # removed by alliek august 2024, doesn't work with new ugrid
+                # format, and our updated grid already has dredged boundaries
+                # to -0.5m so it is unnecessary to update at this time
+                #dredge_grid.dredge_boundary(grid,mowry_feat[1],dredge_depth)
     
     for stni in range(len(flows_ds.station)):
         stn_ds=flows_ds.isel(station=stni)
@@ -151,7 +155,10 @@ def add_sfbay_freshwater(mdu,
                 pli_fn=os.path.join(run_base_dir,rel_bc_dir,"%s%s.pli"%(src_name,suffix)) # added rel_bc_dir alliek dec 2020
                 dio.write_pli(pli_fn,[feat_suffix])
 
-            dredge_grid.dredge_boundary(grid,feat[1],dredge_depth)
+            # removed by alliek august 2024, doesn't work with new ugrid
+            # format, and our updated grid already has dredged boundaries
+            # to -0.5m so it is unnecessary to update at this time
+            #dredge_grid.dredge_boundary(grid,feat[1],dredge_depth)
 
         if 1: #-- Write the time series and stanza in FlowFM_bnd.ext
             if src_name=="EBAYS" and mowry_feat is not None:

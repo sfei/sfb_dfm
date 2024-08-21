@@ -20,9 +20,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_pdf import PdfPages
-from osgeo import ogr
-import json
 import matplotlib.gridspec as gridspec
+import geopandas as gpd
 
 # MAIN INPUT: the mdu filename     
 # mdu_filename = r'/hpcvol2/Open_Bay/Hydro_model/Full_res/WY2017/wy2017_usgs_bc/wy2017_usgs_bc.mdu' #<<<< input here
@@ -42,11 +41,7 @@ def plot_MDU(mdu_filename, gridpath):
     pdf_folder_dir.exists() or pdf_folder_dir.mkdir() 
     
     # read the grid outline
-    file = ogr.Open(gridpath)
-    shape = file.GetLayer(0)
-    #first feature of the shapefile
-    feature = shape.GetFeature(0)
-    grid = json.loads(feature.ExportToJson())['geometry']['coordinates']
+    grid = gpd.read_file(gridpath)
     
     # Open MDU, strip time information using stompy functionality
     MDU = dio.MDUFile(filename=str(mdu_filename))
@@ -166,10 +161,7 @@ def plot_MDU(mdu_filename, gridpath):
                         fig, ax = plt.subplots(tight_layout=True, figsize=(11,11))
     
                         # add the grid outline
-                        for poly in grid:
-                            xp = np.array(poly)[:,0]
-                            yp = np.array(poly)[:,1]
-                            ax.plot(xp,yp,'lightblue')
+                        grid.plot(ax=ax, color='lightblue')
     
                         # plot the data as scatter
                         sc = ax.scatter(df1[0], df1[1], c=df1[2], cmap='jet')
@@ -188,10 +180,7 @@ def plot_MDU(mdu_filename, gridpath):
                         ax2 = fig.add_subplot(gs[1,0:3])
                         ax3 = fig.add_subplot(gs[2,0:3])
                         map_axis = fig.add_subplot(gs[0,3])
-                        for poly in grid:
-                            xp = np.array(poly)[:,0]
-                            yp = np.array(poly)[:,1]
-                            map_axis.plot(xp,yp,'lightblue')
+                        grid.plot(ax=map_axis,color='lightblue')
                         map_axis.axis('off')
                         map_axis.axis('equal')
         
@@ -221,7 +210,7 @@ def plot_MDU(mdu_filename, gridpath):
                         ax3.set_ylabel('temperature')
                         ax1.set_title('%s (%s)' % (fname, boundary_type))
                         for ax in [ax1,ax2,ax3]:
-                            ax.grid(b = True, alpha = 0.25)
+                            ax.grid(alpha = 0.25)
                             format_xaxis(ax) 
                         save_image(fig, os.path.basename(fname).strip('.pli'), pdf)
     
@@ -255,10 +244,7 @@ def plot_MDU(mdu_filename, gridpath):
                         gs = gridspec.GridSpec(1, 4)
                         ax1 = fig.add_subplot(gs[0:3])
                         map_axis = fig.add_subplot(gs[3])
-                        for poly in grid:
-                            xp = np.array(poly)[:,0]
-                            yp = np.array(poly)[:,1]
-                            map_axis.plot(xp,yp,'lightblue')
+                        grid.plot(ax=map_axis,color='lightblue')
                         map_axis.axis('off')
                         map_axis.axis('equal')
         
@@ -302,10 +288,7 @@ def plot_MDU(mdu_filename, gridpath):
                         gs = gridspec.GridSpec(1, 4)
                         ax1 = fig.add_subplot(gs[0:3])
                         map_axis = fig.add_subplot(gs[3])
-                        for poly in grid:
-                            xp = np.array(poly)[:,0]
-                            yp = np.array(poly)[:,1]
-                            map_axis.plot(xp,yp,'lightblue')
+                        grid.plot(ax=map_axis,color='lightblue')
                         map_axis.axis('off')
                         map_axis.axis('equal')
         

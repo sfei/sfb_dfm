@@ -259,7 +259,7 @@ if 1:  # Copy grid file into run directory and update mdu
 # not an initial condition, but dfm doesn't allow it to vary in time, so it has the same 
 # xyz format, and it's based on the same usgs cruise dataset as the initial salinity and temperature,
 # so i added it here
-sfb_dfm_utils.make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir)
+sfb_dfm_utils.make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir, grid)
 
 
 # update to work with rusty's changes to sfb_dfm_utils

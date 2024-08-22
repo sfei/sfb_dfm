@@ -5,3 +5,4 @@ sfbay_potw/
 sfbay_freshwater/
 *.png
 DFM_interpreted_idomain_sfei_v*_net.nc
+run_launcher_part_0.sh

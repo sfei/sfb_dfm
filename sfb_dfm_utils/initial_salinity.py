@@ -77,7 +77,7 @@ def add_initial_salinity(run_base_dir,
     with open(old_bc_fn,'at') as fp:
         fp.write("\n".join(lines))
 
-def make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir):
+def make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir, grid):
 
     ''' allie wrote this around Oct 2022 for HAB simulation, then generalized in Dec
     start time is a numpy datetime object correspondign to the start date and time of the model run
@@ -102,10 +102,6 @@ def make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir):
     # well enough without ocean temperature varying from year to year, don't have to worry about it, but if we are having
     # problems this is something we can troubleshoot
     roms_fn = os.path.join(abs_init_dir,'..','inputs-static','sea_temp_ROMS.nc')
-    
-    # path to the model grid (doesn't matter if it's the same exact one we use for the simulation, just need somthing to 
-    # interpolate onto)
-    grid_fn = os.path.join(abs_init_dir,'..','sfei_v20_net.nc')
     
     # time window for including cruise data (search on either side of the start time, so 35 days means a total 70 day window)
     time_window = np.timedelta64(35,'D')
@@ -249,7 +245,6 @@ def make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir):
                            'npts' : 'int'})
     
     # load the grid, get the cell center coordinates 
-    grid = unstructured_grid.UnstructuredGrid.read_dfm(grid_fn,cleanup=True)
     xy = grid.cells_center()
     xx = xy[:,0]
     yy = xy[:,1]
@@ -335,6 +330,10 @@ def make_initial_sal_temp(run_start, run_stop, abs_init_dir, abs_bc_dir):
         # data2d maps to the grid cell centers
         time_int = data1.copy()
         time_int['weight'] = 1
+
+        # bizarrely getting some nan values of x, y, so filter these out
+        igood = ~np.isnan(time_int).any(axis=1)
+        time_int = time_int.loc[igood].reset_index(drop=True)
 
         smooth = interp_4d.weighted_grid_extrapolation(grid, time_int, alpha=alpha, value_col=value_col)
         assert np.all(np.isfinite(smooth)),"Error -- getting some non-finite values"

@@ -5,11 +5,11 @@
 ################################################
 
 # specify parameters for this run 
-export RUN_NAME="wy2018" # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2017-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2018-10-01"   # run end time in YYYY-MM-DD format
+export RUN_NAME="wy2017-v24" # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2016-08-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2017-10-01"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-export SFB_DFM_PARENT_PATH=/boisevol1/hpcshared/open_bay/hydro/full_res/wy2021_update_repo/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/chicagovol2/hpcshared/open_bay/hydro/full_res/wy2017-v24/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 
 # specify number of processors
 export NPROC=16
@@ -20,9 +20,8 @@ export MAXTEMP=28
 export MINSALT=0
 export MAXSALT=40
 
-# we are using an old anaconda environment for now, need to iron out some bugs
-# so sfb_dfm.py works in newer anaconda environments
-# this is the direct path to python executable:
+# used to use an older python environment, currently
+# just using base environment on sfei servers
 #export PYTHON=/opt/anaconda3/envs/delft_env/bin/python 
 export PYTHON=python
 

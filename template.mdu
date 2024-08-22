@@ -191,7 +191,6 @@ RstInterval       = 0                   # Restart file output times, given as "i
 S1incinterval     =                     # Interval (m) in incremental file for water levels S1
 WaqInterval       = 1800                # Interval (in s) between DELWAQ file outputs
 StatsInterval     =                     # Interval (in s) between simulation statistics output.
-Writebalancefile  = 0                   # Write balance file (1: yes, 0: no)
 TimingsInterval   =                     # Timings statistics output interval
 MapFormat         = 1                   # Map file format, 1: netCDF, 2: Tecplot, 3: netCFD and Tecplot, 4: NetCDF-UGRID
 Wrihis_balance    = 0                   # Write mass balance totals to his file (1: yes, 0: no)

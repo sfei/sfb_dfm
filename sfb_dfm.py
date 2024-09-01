@@ -86,14 +86,14 @@ abs_init_dir = os.path.join(base_dir,'sfb_dfm_utils')
 
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
-net_file = os.path.join(base_dir, 'sfei_v20_straightened_net.nc')
+net_file = os.path.join(base_dir, 'sfei_v23_straightened_net.nc')
 
 # No longer using any new-style boundary conditions
 old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
 obs_shp_fn = os.path.join(abs_static_dir ,'observation-points.shp')
 
 # path to grid boundary shapefile
-grid_boundary_fn = os.path.join(base_dir, 'derived', 'sfei_v20_straightened_net_OUTLINE.shp')
+grid_boundary_fn = os.path.join(base_dir, 'derived', 'sfei_v23_straightened_net_OUTLINE.shp')
 
 # path to cimis input file
 cimis_fn = os.path.join(base_dir,'sfbay_cimis','union_city-hourly.nc')
@@ -145,8 +145,8 @@ os.path.exists(abs_bc_dir) or os.makedirs(abs_bc_dir)
 adjusted_pli_fn = os.path.join(base_dir,'nudged_features.pli') 
 
 # copy polygon file to guide parallelization to run directory
-shutil.copyfile(os.path.join(abs_static_dir,'sfei_v20_straightened_part.pol'), 
-                os.path.join(run_base_dir,'sfei_v20_straightened_part.pol'))
+shutil.copyfile(os.path.join(abs_static_dir,'sfei_v23_straightened_part.pol'), 
+                os.path.join(run_base_dir,'sfei_v23_straightened_part.pol'))
 
 # this line worked in emma's repo that she left on hpc because, but since she cloned rusty's 
 # sfb_dfm_repo he made updates to add_sfbay_freshwater, so changing to work with rusty's updated 

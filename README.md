@@ -119,6 +119,8 @@ run_launcher_part4.sh makes a correction to the DWAQ input files, needed becasue
 
 Finally, to create the aggregated grid hydro input for DWAQ, you can run aggregate_hydro.sh 
 
+Optionally, run postprocess_dwaq_binaries_to_netcdf.py to convert the 30 min DWAQ output to something like a map file. You'll need to break the output into short chunks of time, around one month, or server memory will be overloaded and script will crash. Sometimes it crashes anyway and you have to redo it
+
 See Allie's notes about setting up the delft_env anaconda environment here: 
 https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/edit#bookmark=id.j7qlzh3zbl0h)
 

@@ -27,7 +27,7 @@ else
 	# this is the usual method
 	#dflowfm --partition:ndomains=$NPROC:icgsolver=6 $RUN_NAME.mdu >partition.txt
 	#dflowfm --partition:ndomains=$NPROC:icgsolver=6:genpolygon=1 $RUN_NAME.mdu >partition.txt
-	dflowfm --partition:icgsolver=6 $RUN_NAME.mdu sfei_v20_straightened_part.pol >partition.txt
+	dflowfm --partition:icgsolver=6 $RUN_NAME.mdu sfei_v23_straightened_part.pol >partition.txt
 
 	# can't get it to work for straight grid, so supplied polygons
 	echo ""

@@ -74,7 +74,8 @@ def plot_MDU(mdu_filename, gridpath):
                            'temperaturebnd',
                            'windx',
                            'windy',
-                           'humidity_airtemperature_cloudiness']
+                           'humidity_airtemperature_cloudiness',
+                           'uxuyadvectionvelocitybnd']
 
     # read the external forcing file and build up a dictionary describing the boundary conditions
     boundary_conditions = {}
@@ -129,8 +130,12 @@ def plot_MDU(mdu_filename, gridpath):
                 fname = boundary_conditions[ibc]['filename']
 
                 if btype == boundary_type:
+
+                    if btype == 'uxuyadvectionvelocitybnd':
+
+                        print('uxuyadvectionvelocitybnd is always just zero, ignore')
                 
-                    if btype in ['windx','windy','humidity_airtemperature_cloudiness']:
+                    elif btype in ['windx','windy','humidity_airtemperature_cloudiness']:
     
                         print('Scanning %s for NaN, need to add code if you want to plot it...' % fname)
 

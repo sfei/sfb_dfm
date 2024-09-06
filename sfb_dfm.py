@@ -148,6 +148,7 @@ adjusted_pli_fn = os.path.join(base_dir,'nudged_features.pli')
 shutil.copyfile(os.path.join(abs_static_dir,'sfei_v23_straightened_part.pol'), 
                 os.path.join(run_base_dir,'sfei_v23_straightened_part.pol'))
 
+
 # this line worked in emma's repo that she left on hpc because, but since she cloned rusty's 
 # sfb_dfm_repo he made updates to add_sfbay_freshwater, so changing to work with rusty's updated 
 # sfb_dfm_utils (alliek dec 2020)     
@@ -370,6 +371,25 @@ if 1:
     '\\1_Nutrient_Share\\2_Data_NUTRIENTS\\SFEI_Wind\\Wind4DFlow-SFB-UTC\\\n' + 
     '(https://drive.google.com/drive/folders/1WzqvNo0I0yoWI3KHeDkvtnCrp_MqY5t4)\n' +
     'Make sure to change the permissions of windx.amu and windy.amv, using chmod, once you have uploaded them, so DFM can read them!\n')
+
+
+# add zero momentum boundary condition for ocean boundary
+if 1:
+
+    lines=["QUANTITY=uxuyadvectionvelocitybnd",
+           "FILENAME=%s/seauxuy.pli"  % rel_bc_dir,
+           "FILETYPE=9",
+           "METHOD=2",
+           "OPERAND=O"]
+    with open(old_bc_fn ,'at') as fp:
+        fp.write("\n".join(lines)) 
+
+    shutil.copyfile(os.path.join(abs_static_dir,'seauxuy.pli'),
+        os.path.join(run_base_dir,rel_bc_dir,'seauxuy.pli'))
+
+    for i in [1,2,3,4,5,6]:
+        shutil.copyfile(os.path.join(abs_static_dir,'seauxuy.tim'),
+            os.path.join(run_base_dir,rel_bc_dir,'seauxuy_%04d.tim' % i))
 
 
 ##

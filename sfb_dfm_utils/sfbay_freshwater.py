@@ -17,7 +17,7 @@ def add_sfbay_freshwater(mdu,
                          rel_bc_dir,     # added directory for bc files alliek dec 2020
                          adjusted_pli_fn,
                          freshwater_dir,
-                         grid,dredge_depth,
+                         grid,dredge_depth,temperature_fn,
                          all_flows_unit=False,
                          time_offset=None):
     """
@@ -38,6 +38,11 @@ def add_sfbay_freshwater(mdu,
     run_base_dir=mdu.base_path
     ref_date,run_start,run_stop = mdu.time_range()
     old_bc_fn=mdu.filepath(["external forcing","ExtForceFile"])
+
+    # read climatalogical stream temperature from alameda creek
+    df_alameda = pd.read_csv(temperature_fn)
+    day_A = df_alameda['Decimal Day (UTC)'].values
+    temp_A = df_alameda['Temp (oC)'].values
     
     if time_offset is not None:
         run_start = run_start + time_offset
@@ -48,7 +53,14 @@ def add_sfbay_freshwater(mdu,
         df=stn_ds.to_dataframe().reset_index()
         df['elapsed_minutes']=(df.time.values - ref_date)/np.timedelta64(60,'s')
         df['salinity']=0*df.flow_cms
-        df['temperature']=20+0*df.flow_cms
+
+        # cast climatalogical temperatures from alameda creek onto trib flow time axis
+        time_1 = df.time.values
+        years_1 = pd.DatetimeIndex(time_1).year.values
+        time_1_jan1 = np.array([np.datetime64('%d-01-01' % year) for year in years_1])
+        day_1 = np.floor((time_1 - time_1_jan1)/np.timedelta64(1,'D'))
+        temp_1 = np.interp(day_1, day_A, temp_A)
+        df['temperature']=temp_1
 
         if all_flows_unit:
             df['flow_cms']=1.0+0*df.flow_cms

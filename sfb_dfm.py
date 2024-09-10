@@ -158,6 +158,7 @@ sfb_dfm_utils.add_sfbay_freshwater(mdu,
                          freshwater_dir = os.path.join(base_dir,'sfbay_freshwater'),
                          grid = grid,
                          dredge_depth = dredge_depth,
+                         temperature_fn=os.path.join(base_dir,'alameda_creek_climatology','Alameda_Creek_Climatological_Temperature.csv'),
                          all_flows_unit = ALL_FLOWS_UNIT,
                          time_offset = None)
 

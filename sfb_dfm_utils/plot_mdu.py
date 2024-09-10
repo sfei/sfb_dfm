@@ -270,14 +270,14 @@ def plot_MDU(mdu_filename, gridpath):
                                 nanprint += ('WARNING!!! NaN found in %s\n' % fname)
                                 numnanfiles+=1
                             
-                            # add up the flows
+                            # take the first flow, make sure it matches the others
                             if i==0:
                                 time = t_ref + df1[0].values.astype('timedelta64[%s]' % tunit)
                                 flow = df1[1].values
                                 legstr = names[i] + '.tim'
                             else:
-                                flow += df1[1].values
-                                legstr += ' + ' + names[i] + '.tim'
+                                assert np.array_equal(flow, df1[1].values)
+
                         ax1.set_title('%s (%s)' % (fname, boundary_type))
                         ax1.plot(time, flow, label=legstr)    
                         ax1.grid(alpha = 0.25)
@@ -315,9 +315,13 @@ def plot_MDU(mdu_filename, gridpath):
                                 numnanfiles+=1
                             
                             # extract the time and scalar values
-                            time = t_ref + df1[0].values.astype('timedelta64[%s]' % tunit)
-                            scalar = df1[1].values
-                            ax1.plot(time, scalar, label=names[i] + '.tim') 
+                            if i==0:
+                                time = t_ref + df1[0].values.astype('timedelta64[%s]' % tunit)
+                                scalar = df1[1].values
+                                ax1.plot(time, scalar, label=names[i] + '.tim') 
+                            else:
+                                assert np.array_equal(scalar, df1[1].values)
+                                
                         ax1.set_title('%s (%s)' % (fname, boundary_type))
                         ax1.grid(alpha = 0.25)
                         ax1.legend()

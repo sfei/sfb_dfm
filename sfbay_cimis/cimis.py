@@ -118,8 +118,8 @@ def cimis_fetch_to_xr(stations, # Union City
 ## 
 
 #2/5/2001 is start of record for union city
-start_date = '2012-01-01'
-end_date = '2023-12-31'
+start_date = '2020-07-01'
+end_date = '2021-11-01'
 
 #period=[np.datetime64('2001-02-01'),
 #        np.datetime64('2022-08-19')]

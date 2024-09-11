@@ -24,6 +24,7 @@ def fill_data(da):
 
 def add_ocean(run_base_dir,rel_bc_dir,
               run_start,run_stop,ref_date,
+              base_dir,
               static_dir,
               grid,old_bc_fn,
               all_flows_unit=False,
@@ -106,15 +107,30 @@ def add_ocean(run_base_dir,rel_bc_dir,
                 else:
                     # Adjust time base directly.
                     water_level.time.values[:] = water_level.time.values + np.timedelta64(lag_seconds,'s')
-            
-        if 'water_temperature' not in tides:
-            log.warning("Water temperature was not found in NOAA data.  Will use constant 15")
-            water_temp=15+0*tides.water_level
-            water_temp.name='water_temperature'
-        else:
-            fill_data(tides.water_temperature)
-            water_temp=tides.water_temperature
-                                             
+
+        # depreciate with v24 (but note wy2013-v24, wy2017-v24, wy2018-v24 were run with temperatures
+        # downloaded along with tidal water level)
+        #if 'water_temperature' not in tides:
+        #    log.warning("Water temperature was not found in NOAA data.  Will use constant 15")
+        #    water_temp=15+0*tides.water_level
+        #    water_temp.name='water_temperature'
+        #else:
+        #    fill_data(tides.water_temperature)
+        #    water_temp=tides.water_temperature
+        
+        # updated approach in the middle of v24, inspired by huge gap in point reyes
+        # temperatures in wy2021 and a pretty big one in wy2016 too
+        # read the ocean temperature csv, may need to manually update
+        df_temp=pd.read_csv(os.path.join(base_dir,'ocean_temperature_data','ocean_temperature.csv'))
+        timei = tides.time.values
+        timet = df_temp['datetime_UTC'].astype('datetime64[ns]').values
+        tempt = df_temp['temp_oC'].values
+        tempi = np.interp((timei-timei[0])/np.timedelta64(1,'s'),(timet-timei[0])/np.timedelta64(1,'s'),tempt)
+        water_temp = tempi + 0*tides.water_level
+        water_temp.name='water_temperature'
+
+
+
         if all_flows_unit:
             print("-=-=-=- USING 35 PPT WHILE TESTING! -=-=-=-")
             salinity=35 + 0*water_level

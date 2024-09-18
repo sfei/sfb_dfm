@@ -56,7 +56,7 @@ itstop  = None
 
 # include temperutre? don't try to include temperature if it was not modeled UNLESS it has the same number of 
 # time steps as the other model output, otherwise you will get into trouble
-include_temperature = False
+include_temperature = True
 
 # plot last time step to see if things look ok???
 plot_last_time_step = True

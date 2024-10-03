@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pylab as plt
 import os, sys
 
-maxyear=2023
+maxyear=2024
 
 # compile SF Data
 for iy,year in enumerate(range(2000,maxyear)):

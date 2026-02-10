@@ -86,7 +86,7 @@ abs_init_dir = os.path.join(base_dir,'sfb_dfm_utils')
 
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
-net_file = os.path.join(base_dir, 'sfei_v23_straightened_net.nc')
+net_file = os.path.join(base_dir, 'sfei_v24_straightened_net.nc') # updated 2/9/26 to fix levee issues
 
 # No longer using any new-style boundary conditions
 old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
@@ -279,7 +279,7 @@ sfb_dfm_utils.add_initial_salinity(run_base_dir,
 
 
 if 1: # fixed weir file is just referenced as static input
-    mdu['geometry','FixedWeirFile'] = os.path.join(rel_static_dir,'SBlevees_tdk.pli') 
+    mdu['geometry','FixedWeirFile'] = os.path.join(rel_static_dir,'SBlevees_tdk_v25.pli') # modified 2/9/26 to fix levee issues
 
 if 1: 
     # evaporation was a bit out of control in south bay - try scaling back just

@@ -86,14 +86,14 @@ abs_init_dir = os.path.join(base_dir,'sfb_dfm_utils')
 
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
-net_file = os.path.join(base_dir, 'sfei_v24_straightened_net.nc') # updated 2/9/26 to fix levee issues
+net_file = os.path.join(base_dir, 'sfei_v25_straightened_net.nc') # updated 2/9/26 to fix levee issues
 
 # No longer using any new-style boundary conditions
 old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
 obs_shp_fn = os.path.join(abs_static_dir ,'observation-points.shp')
 
 # path to grid boundary shapefile
-grid_boundary_fn = os.path.join(base_dir, 'derived', 'sfei_v24_straightened_net_OUTLINE.shp')
+grid_boundary_fn = os.path.join(base_dir, 'derived', 'sfei_v25_straightened_net_OUTLINE.shp')
 
 # path to cimis input file
 cimis_fn = os.path.join(base_dir,'sfbay_cimis','union_city-hourly.nc')

@@ -93,7 +93,7 @@ old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
 obs_shp_fn = os.path.join(abs_static_dir ,'observation-points.shp')
 
 # path to grid boundary shapefile
-grid_boundary_fn = os.path.join(base_dir, 'derived', 'sfei_v23_straightened_net_OUTLINE.shp')
+grid_boundary_fn = os.path.join(base_dir, 'derived', 'sfei_v24_straightened_net_OUTLINE.shp')
 
 # path to cimis input file
 cimis_fn = os.path.join(base_dir,'sfbay_cimis','union_city-hourly.nc')
@@ -307,6 +307,20 @@ if 1:
 
     if run_name.startswith('short'):
         mdu['output','MapInterval'] = 3600
+
+if 1:
+
+    mdu['output','Wrishp_crs']                    = 1  # Write shape file for cross section
+    mdu['output','Wrishp_weir']                       = 1      # Write shape file for weirs
+    mdu['output','Wrishp_gate']                       = 1      # Write shape file for gates
+    mdu['output','Wrishp_fxw']                        = 1      # Write shape file for fixed weirs
+    mdu['output','Wrishp_thd']                        = 1      # Write shape file for thin dams
+    mdu['output','Wrishp_obs']                        = 1      # Write shape file for observation stations
+    mdu['output','Wrishp_emb']                        = 1      # Write shape file for embankments
+    mdu['output','Wrishp_dryarea']                    = 1      # Write shape file for dry area
+    mdu['output','Wrishp_enc']                        = 1      # Write shape file for enclosure
+    mdu['output','Wrishp_src']                        = 1      # Write shape file for sources
+    mdu['output','Wrishp_pump']                       = 1      # Write shape file for pump
 
 
 # initialze a string to print at the end of this script

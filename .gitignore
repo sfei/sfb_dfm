@@ -4,6 +4,6 @@ sfb_dfm_utils/cache
 sfbay_potw/
 sfbay_freshwater/
 *.png
-DFM_interpreted_idomain_sfei_v*
+DFM_interpreted_idomain*
 run_launcher_part_0.sh
 sfei_*_00*_net.nc

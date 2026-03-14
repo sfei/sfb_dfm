@@ -198,6 +198,7 @@ Wrihis_structure_gen= 0                   # Write general structure parameters t
 Wrihis_structure_dam= 0                   # Write dam parameters to his file (1: yes, 0: no)
 Wrihis_structure_pump= 0                   # Write pump parameters to his file (1: yes, 0: no)
 Wrihis_structure_gate= 0                   # Write gate parameters to his file (1: yes, 0: no)
+Wrihis_waves = 1                           # Write wave data to his file, (1: yes, 0: no)
 Wrimap_waterlevel_s0= 0                   # Write water levels for previous time step to map file (1: yes, 0: no)
 Wrimap_waterlevel_s1= 1                   # Write water levels to map file (1: yes, 0: no)
 Wrimap_velocity_component_u0= 0                   # Write velocity component for previous time step to map file (1: yes, 0: no)

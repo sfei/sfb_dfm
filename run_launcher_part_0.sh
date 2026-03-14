@@ -5,11 +5,11 @@
 ################################################
 
 # specify parameters for this run 
-export RUN_NAME="wy2023-v24" # name of the run (this will be name of *.mdu file and folder it's stored in)
-export RUN_START="2022-08-01"  # run start time in YYYY-MM-DD format
-export RUN_STOP="2022-08-15"   # run end time in YYYY-MM-DD format
+export RUN_NAME="SFB_hydro_fetch_run0001" # name of the run (this will be name of *.mdu file and folder it's stored in)
+export RUN_START="2018-05-01"  # run start time in YYYY-MM-DD format
+export RUN_STOP="2019-08-20"   # run end time in YYYY-MM-DD format
 export MAKE_PLOTS="True"       # flag to make and save plots of boundary conditions
-export SFB_DFM_PARENT_PATH=/fortcollinsvol1/alliek/test_run/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
+export SFB_DFM_PARENT_PATH=/fortcollinsvol2/hpcshared/sed_trans/whole_bay_model/hydro/SFB_hydro_fetch_run0001/     # this is the directory where the sfb_dfm and stompy are located, and it is where the "runs" folder will be created
 
 # specify number of processors
 export NPROC=16

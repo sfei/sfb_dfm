@@ -144,10 +144,16 @@ PavBnd            = 0                   # Average air pressure on open boundarie
 PavIni            = 0                   # Average air pressure for initial water level correction (N/m2) (only applied if > 0)
 
 [waves]
-Wavemodelnr       = 0                   # Wave model nr. (0: none, 1: fetch/depth limited hurdlestive, 2: Young-Verhagen, 3: SWAN, 4: wave group forcing)
-WaveNikuradse     = 0.01                # Wave friction Nikuradse ks coefficient (m), used in Krone-Swart
-Rouwav            = FR84                # Friction model for wave induced shear stress
-Gammax            = 1                   # Maximum wave height/water depth ratio
+Wavemodelnr                       = 1                               # Wave model nr. (0: none, 1: fetch/depth limited Hurdle-Stive, 2: Young-Verhagen, 3: SWAN)
+WaveNikuradse                     = 0.001                            # Wave friction Nikuradse ks c , used in Krone-Swart
+Rouwav                            = FR84                            # Friction model for wave induced shear stress
+Gammax                            = 0.6                               # Maximum wave height/water depth ratio
+uorbfac                       = 0                   # Orbital velocities: 0=D3D style; 1=Guza style
+jahissigwav                   = 1                   # 1: sign wave height on his output; 0: hrms wave height on his output. Default=1.
+jamapsigwav                   = 1                   # 1: sign wave height on map output; 0: hrms wave height on map output. Default=0 (legacy behaviour).
+hminlw                            = 0.2                # Cut-off depth for application of wave forces in momentum balance
+Tifetchcomp                   = 3600              # Time interval of recalculating fetch (taking water depth into account) 
+WaveSwartDelwaq                   = 1                               # if WaveSwartDelwaq == 1 .and. Tiwaq > 0 then increase tauwave to Delwaq with 0.5rho*fw*uorbuorb
 
 [time]
 RefDate           = 20120801            # Reference date (yyyymmdd)

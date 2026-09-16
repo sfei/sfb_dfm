@@ -59,7 +59,7 @@ TimeStepType      = 2                   # Time step handling (0: only transport,
 Limtyphu          = 0                   # Limiter type for waterdepth in continuity eqn. (0: none, 1: minmod, 2: van Leer, 3: Kooren, 4: monotone central)
 Limtypmom         = 4                   # Limiter type for cell center advection velocity (0: none, 1: minmod, 2: van Leer, 3: Kooren, 4: monotone central)
 Limtypsa          = 4                   # Limiter type for salinity transport (0: none, 1: minmod, 2: van Leer, 3: Kooren, 4: monotone central)
-TransportMethod   = 1                   # Transport method (0: Herman's method, 1: transport module)
+#TransportMethod   = 1                   # Transport method (0: Herman's method, 1: transport module)
 Vertadvtypsal     = 6                   # Vertical advection type for salinity (0: none, 1: upwind explicit, 2: central explicit, 3: upwind implicit, 4: central implicit, 5: central implicit but upwind for neg. stratif., 6: higher order explicit, no Forester)
 Icgsolver         = 2                   # Solver type (1: sobekGS_OMP, 2: sobekGS_OMPthreadsafe, 3: sobekGS, 4: sobekGS + Saadilud, 5: parallel/global Saad, 6: parallel/Petsc, 7: parallel/GS)
 Maxdegree         = 6                   # Maximum degree in Gauss elimination
@@ -74,7 +74,7 @@ Tlfsmo            = 10800               # Fourier smoothing time (s) on waterlev
 Slopedrop2D       = 0                   # Apply droplosses only if local bed slope > Slopedrop2D, (<=0: no drop losses)
 Chkadvd           = 0.1                 # Check advection terms if depth < chkadvdp, => less setbacks
 Teta0             = 0.55                # Theta of time integration (0.5 < theta < 1)
-Qhrelax           = 0.01                # Relaxation on Q-h open boundaries
+#Qhrelax           = 0.01                # Relaxation on Q-h open boundaries
 Jbasqbnddownwindhs= 0                   # Water depth scheme at discharge boundaries (0: original hu, 1: downwind hs)
 cstbnd            = 1                   # Delft-3D type velocity treatment near boundaries for small coastal models (1: yes, 0: no)
 Maxitverticalforestersal= 0                   # Forester iterations for salinity (0: no vertical filter for salinity, > 0: max nr of iterations)
@@ -87,7 +87,7 @@ AntiCreep         = 0                   # Include anti-creep calculation (0: no,
 Maxwaterleveldiff = 0                   # upper bound (in m) on water level changes (<= 0: no bounds). Run will abort when violated.
 Maxvelocitydiff   = 0                   # upper bound (in m/s) on velocity changes (<= 0: no bounds). Run will abort when violated.
 Epshu             = 0.01              # Threshold water depth for wet and dry cells. RH: bump to conservative value of 1 cm
-TransportTimestepping= 0                   # Timestepping method in Transport module, 0 = global (default) , 1 = local
+#TransportTimestepping= 0                   # Timestepping method in Transport module, 0 = global (default) , 1 = local
 Cffacver          = 0.                  # Factor for including (1-CFL) in HO term vertical   (0d0: no, 1d0: yes)
 # RH: commented due to dflowfm complaints.
 #Cffachor          = 1.                  # Factor for including (1-CFL) in HO term horizontal (0d0: no, 1d0: yes)
@@ -132,7 +132,7 @@ Stanton           = 0.00145             # Coefficient for convective heat flux (
 Dalton            = 0.0015              # Coefficient for evaporative heat flux ( ), if negative, Cd wind*abs(Dalton)
 Backgroundwatertemperature= 15                  # Background water temperature for eqn. of state (deg C)
 SecondaryFlow     = 0                   # Secondary flow (0: no, 1: yes)
-EffectSpiral      = 0                   # Weight factor of the spiral flow intensity on transport angle
+#EffectSpiral      = 0                   # Weight factor of the spiral flow intensity on transport angle
 BetaSpiral        = 0                   # Weight factor of the spiral flow intensity on flow dispersion stresses
 
 [wind]
@@ -145,7 +145,7 @@ PavIni            = 0                   # Average air pressure for initial water
 
 [waves]
 Wavemodelnr       = 0                   # Wave model nr. (0: none, 1: fetch/depth limited hurdlestive, 2: Young-Verhagen, 3: SWAN, 4: wave group forcing)
-WaveNikuradse     = 0.01                # Wave friction Nikuradse ks coefficient (m), used in Krone-Swart
+#WaveNikuradse     = 0.01                # Wave friction Nikuradse ks coefficient (m), used in Krone-Swart
 Rouwav            = FR84                # Friction model for wave induced shear stress
 Gammax            = 1                   # Maximum wave height/water depth ratio
 
@@ -174,7 +174,7 @@ Rainfall          = 0                   # Include rainfall, (0=no, 1=yes)
 TrtRou            = N                   # Include alluvial and vegetation roughness (trachytopes) (Y: yes, N: no)
 TrtDef            =                     # Filename (*.ttd) including trachytope definitions
 TrtL              =
-TrtDt             = 60
+#TrtDt             = 60
 DtTrt             =                     # Interval (in s) between trachytope roughness updates
 
 [output]

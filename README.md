@@ -1,135 +1,161 @@
- These scripts set up and run the hydrodynamic solver, DFM, for the SFEI Open Bay model. Much of the setup is automatic! The parts Rusty wrote are totally automatic. The parts Allie wrote require a little more babysitting on the part of the user, but hopefully not too much! 
+Last updated by Allie King Sept. 16, 2026
 
- The sfb_dfm repo has been migrated to SFEI's github page and is now found here:
+These scripts set up and run the hydrodynamic solver, DFM, for the SFEI Open Bay model. Much of the setup is automatic! The parts Rusty wrote are totally automatic. The parts Allie wrote require a little more babysitting on the part of the user, but hopefully not too much.
+
+The sfb_dfm repo has been migrated to SFEI's github page and is now found here:
     https://github.com/sfei/sfb_dfm.git
- along with its two submodules:
-    https://github.com/sfei/sfbay_freshwater.git
+along with its two submodules:
+    https://github.com/sfei/sfbay_freshwater.git 
     https://github.com/sfei/sfbay_potw.git
- You can find the "original" sfb_dfm and the original three submodules sfb_dfm_utils, sfbay_freshwater, and sfbay_potw in Rusty Holleman's github account
+You can find the "original" sfb_dfm and the original three submodules sfb_dfm_utils, sfbay_freshwater, and sfbay_potw in Rusty Holleman's github account
     https://github.com/rustychris/
- Rusty's version was used to run the original wy2013 simulation. Emma Nuss made some changes, including updating the POTW flows through 2019, and her version is in her github account:
-    https://github.com/emmashie
- Note that sfb_dfm_utils has been sucked into the main sfb_dfm repository and is no longer a separate module
+Rusty's version was used to run the original wy2013 simulation. Emma Nuss made some changes, including updating the POTW flows through 2019, and her version is in her github account:
+    https://github.com/emmashie/
+Note that in Rusty and Emma’s versions, sfb_dfm_utils was a separate module, but now it has been sucked into the main sfb_dfm repository.
 
- Steps for setting up an open bay hydro simulation:
+Directions for accessing github from the SFEI servers can be found here: https://docs.google.com/document/d/1HTvA5CZEFIRTJ8Wd2Bk1P5C9OulmB7pstvo8044oSFI/edit?tab=t.0#bookmark=id.668rmjerjylf
+and here is a quick link to the steps you need to take every time, after the initial setup: https://docs.google.com/document/d/1CzJB8GERYrL7ppf_n1s3Hmggqkb1deBmSu-8Xp5yRiY/edit?tab=t.0#bookmark=id.9tlsnko7g5w5
 
- 1) create a folder for the run, e.g. run_folder located at 
-        /run_path/run_folder/
-    we have been storing our more recent runs in these "run_path" on the new servers:
-        /chicagovol2/hpcshared/open_bay/hydro/full_res/
-        /boisevol2/hpcshared/open_bay/hydro/full_res/
-        /fortcollinsvol2/hpcshared/open_bay/hydro/full_res/
-    for example, for the wy2021-v24 run, on boise, we created the following directory:
-        /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
- 2) clone sfb_dfm from https://github.com/sfei/sfb_dfm.git into this folder, e.g.
-        cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
-        git clone https://github.com/sfei/sfb_dfm.git
- 3) clone stompy into the same folder:
-        cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
-        git clone https://github.com/rustychris/stompy
- 4) create a folder called "runs" in this same folder, and then create a folder with the name of the run inside that folder, and make a folder called "bc_files" inside that one, e.g., if your run name is "wy2021a" do this:
-        cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
-        mkdir runs
-        cd runs
-        mkdir wy2021a
-        cd wy2021a 
-        mkdir bc_files
-    so now you have the following directories in our example:
-        /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/
-        /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/stompy/
-        /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/bc_files/
- 5) now navigate inside the sfb_dfm folder and clone the two repositories that 
-    contain freshwater inputs from the tributaries and the potw's, respectively. take a moment to make sure that these contain data through the simulation period, e.g. 
-        cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24//sfb_dfm/
-        git clone https://github.com/sfei/sfbay_freshwater.git
-        git clone https://github.com/sfei/sfbay_potw.git 
-		
-Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period. You need to check three things, to start:
+You will need a compatible anaconda environment for running the python scripts that set up the run. See notes about setting up the delft_env anaconda environment here: 
+https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/edit#bookmark=id.j7qlzh3zbl0h)
 
- 6) check input data to make sure it covers simulation period
-	a) check the freshwater inflows file to make sure there are data during the simulation period, e.g.
-			/boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/sfbay_freshwater/outputs/sfbay_freshwater.nc
-	this data comes primarily from hydrological models at SFEI. For our original wy2013-wy2017 runs the data were based on BAHM, and Emma's notes give an overview of that model here: 
-			https://docs.google.com/document/d/1zcmm4JZ3jDb_MAG8dfY-vgInAC1kAH1N76LW4PV8Q5k/edit#heading=h.emy5l0qu2qlh
-	for our original wy2018-wy2022 runs and for the runs in the 2026 hydrodynamic model report we use WDM. See page 10:
-            https://docs.google.com/document/d/183hgBbOs3_sb2ApdIavWZ1eBT59kRYL9Won3lJJhZ_k/edit?tab=t.0
-	b) check the POTW inflows file to make sure there are data during the simulation period:
-			/boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/sfbay_potw/outputs/sfbay_delta_potw.nc
-    these data come from a variety of sources, but the vast majority of the data are based on reporting by the POTW's in the annual GAR report that Dave Senn gets from Mike Falk. there's about a one year delay between a given water year and the report availability.
+Steps for setting up an open bay hydro simulation:
 
-    Warning: make sure the file is actually called "sfbay_delta_potw.nc", and not something
-    slightly different like sfbay_delta_potw_Aug2022.nc because this is the file name sfb_dfm will look for
-	c) check that the precipitation/evaporation data from CIMIS station 171 in Union City includes the simulation period. the input file is here:
-			/boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/sfbay_cimis/union_city-hourly.nc
-	if you need to, you can use the cimis.py script in the same folder as this netcdf file to download more data and suck it into the input file. note rusty had this happending automatically but we made it a bit more manual because of major bugginess involved in the automation
-    d) to create the salinity and temperature initial condition, and to create a spatially varying secchidepth (for the heat model) we need data from the USGS Peterson Cruise. go to the following website: 
-			https://sfbay.wr.usgs.gov/water-quality-database/
-    and download data starting from 15 days before the start date of the simulation through the end of the simulation. for a typical single water year simulation, that means downloading data for two calendar years spanning the water year. multiple years of data need to be spliced together by hand. the spliced file should be named wqdata.csv. upload this file to the following folder so sfb_dfm can find it:
-			/boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/inputs-static/
-	make sure to change the permissions so sfb_dfm can read it:
-			/boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/inputs-static/
-			chmod ugo+r wqdata.csv
-			
-The wind and meterological input need to be generated using repositories that live on SFEI's Google Drive. You can either ask Allie to do this (it takes her all of 5 minutes to launch the scripts), or you can try to generate them yourself. To generate them yourself, you either need to use a laptop running Google Drive for Desktop (formerly called Filestream) with the correct folders mounted, or you need to download the whole repository to your computer, and they are big, so you probably don't want to do that. Make sure these inputs are in the UTC time zone like the rest of the model
+1) Create a folder for the run, e.g., run_folder located at 
+    /run_path/run_folder/
+We have been storing our more recent runs in these "run_path" on the new servers:
+    /chicagovol2/hpcshared/open_bay/hydro/full_res/
+    /boisevol2/hpcshared/open_bay/hydro/full_res/
+    /fortcollinsvol2/hpcshared/open_bay/hydro/full_res/
+for example, for the wy2021-v24 run, on boise, we created the following directory:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
 
- 7) generate the wind inputs using the following repository:
-        1_Nutrient_Share/9_Miscellaneous_Data/SFEI_Wind/ 
-        (link: https://drive.google.com/drive/folders/1e0GGrld8uqjpnBkHCtsQK4-BVl9e1G3G?usp=share_link)
-    check the README.txt and Documentation folder to learn how this repo works, or skip ahead and just modify and run the python script /SFEI_Wind/Wind4DFlow-SFB-UTC/generate_amu_amv_4SFB_nearbay_stations_only.py to generate the input files you need. the files are generated in the same folder as this script, and you can pick the name. if you end up with an empty file, you're going to need to download and process more wind data, and you will have to read about how to do that in the documentation folder. note we used to use the file generate_amu_amv_4SFB.py, which used wind from 52 stations around the bay, but in summer 2024 we switched to generate_amu_amv_4SFB_nearbay_stations_only.py which excludes stations that are far from the bay and uses nearest neighbor interpolation instead of linear or natural neighbor, for simplicity. this switch was motivated by improvement of temperature predictions but we did not really properly test whether it improves things, because it was coupled with other changes. nevertheless, it seems like a better idea to only use nearby wind stations and to use a simpler form of interpolation
-    
- 8) generate the meteorlogical inputs using the following repository:
-        1_Nutrient_Share/9_Miscellaneous_Data/SFEI_Meteo/
-        (link: https://drive.google.com/drive/folders/1vph_vQT1CL5BlgomudxDm-58BNfksLQZ?usp=sharing)
-    use the script generate_hac_4SFB_curvilinear_station_data_based.py to generate the hac.tem input file (the meteorological forcing). This script replaces the original air temperature (which was from all 52 wind stations) with air temperatures at NDBC stations only (which are on the water). Also replace relative humidity from the gridmet dataset with relative humidity from a set of CIMIS and ASOS stations that are not on the water but are closest to the water. Finally use CIMIS measurements of shortwave radiation to compute cloudiness instead of the daily gridMET dataset, taking care to line up the daily curves in time since sometimes an offset creates crazy cloudiness values. Use simple nearest neighbor interpolation for all three parameters. The data that feeds into this script is all in the SFEI_Wind repository. Note we updated our meteorlogical forcing in summer 2024, and this drastically improves the temperature predictions in our model. The old approach used air temperatures from all 52 wind stations, and used the gridMET dataset to estimate cloudiness and relative humidity. 
+2) Clone sfb_dfm from https://github.com/sfei/sfb_dfm.git into this folder, e.g.
+    cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
+    git clone https://github.com/sfei/sfb_dfm.git
 
-  9) upload the wind and meterological forcing files to the following location:
-        /run_path/run_folder/runs/run_name/bc_files/
-    e.g. in our example, you would upload them into this folder:
-        /boisevol1/hpcshared/open_bay/hydro/full_res/wy2005/wy2005a/bc_files/
-    and make sure to rename them as follows:
-        hac.tem = meteorological forcing
-        windx.amu = wind forcing, east component
-        windy.amv = wind forcing, north component
-    This is the location and name where /run_path/run_folder/runs/run_name/FlowFMold_bnd.ext tells DFM they are located. You can take a look at FlowFMold_bnd.ext if you like, it is a text file, and this is where the types of boundary conditions and the paths to their corresponding input files are specified
-    
- 10) from the linux command line, make sure to change permissions so DFM can read the meteo and wind files, e.g.
-        cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/wy2021a/
-        chmod -R ugo+r *
+3) Clone stompy into the same folder:
+    cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
+    git clone https://github.com/rustychris/stompy
 
- 11) if you are running the "old" version of DFM (r52184-opt) you will need to delete the secchidepth parameter from the list of input files, as this parameter is not recognized in the earlier version of the code, and it will crash your simulation. Edit the FlowFMold_bnd.ext file inside the run folder to delete the block of text about secchidepth.
+4) Create a folder called "runs" in this same folder, and then create a folder with the name of the run inside that folder, and make a folder called "bc_files" inside that one, e.g., if your run name is "wy2021a" do this:
+    cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
+    mkdir runs
+    cd runs
+    mkdir wy2021a
+    cd wy2021a 
+    mkdir bc_files
+so now you have the following directories in our example:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/stompy/
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/bc_files/
+5) now navigate inside the sfb_dfm folder and clone the two repositories that contain freshwater inputs from the tributaries and the POTWs, respectively, e.g., 
+    cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/
+    git clone https://github.com/sfei/sfbay_freshwater.git
+    git clone https://github.com/sfei/sfbay_potw.git
+        
+6) Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period. You need to check three things, to start:
 
-Now we are done with the manual inputs, and we can start the automatic part of the run setup. First, you need to run the python script sfb_dfm.py. This will generate all the remaining input files for your DFlow3D-FM (DFM) run. Next, you need to run DFM on these input files. Finally, if you are planning to use the results of the simulation to run a DWAQ simulation, you are going to need to do two postprocessing steps: first the DWAQ hydro files from the 16 domains in the parallel simulation need to be stitched together, and second, if you are using the old version of the code (r52184-opt), the flow rates coming out of the point sources need to be corrected because this version of DFMleaves them out of the DWAQ hydro files. We have created a series of shell scripts that do all of this for you, but they are very specific to SFEI's servers. If you want to run the model outside SFEI, you will need to find your own way of running sfb_dfm.py, running DFM on your input files, and doing the two postprocessing steps. If you use a newer version of DFM you will not need to correct the point sources, but it doesn't hurt to do that anyway.
+a) Check the freshwater inflows file to make sure there are data during the simulation period, e.g.
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/sfbay_freshwater/outputs/sfbay_freshwater.nc
+
+This data comes primarily from hydrological models at SFEI. For our original wy2013-wy2017 runs the data were based on BAHM, and Emma's notes give an overview of that model here: 
+https://docs.google.com/document/d/1zcmm4JZ3jDb_MAG8dfY-vgInAC1kAH1N76LW4PV8Q5k/edit#heading=h.emy5l0qu2qlh
+
+For our original wy2018-wy2022 runs and for the runs in the 2026 hydrodynamic model report we use WDM. See page 10: https://docs.google.com/document/d/183hgBbOs3_sb2ApdIavWZ1eBT59kRYL9Won3lJJhZ_k/edit?tab=t.0
+
+b) Check the POTW inflows file to make sure there is data during the simulation period, e.g.
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/sfbay_potw/outputs/sfbay_delta_potw.nc
+
+This data comes from a variety of sources, but the vast majority is based on reporting by the POTW's in the annual GAR report that Dave Senn gets from Mike Falk. There's about a one year delay between a given water year and the report availability.
+
+Warning: Make sure the file is actually called "sfbay_delta_potw.nc", and not something
+slightly different like sfbay_delta_potw_Aug2022.nc because this is the file name sfb_dfm will look for. Rename if necessary.
+
+c) Check that the precipitation/evaporation data from CIMIS station 171 in Union City includes the simulation period. The input file is here:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/sfbay_cimis/union_city-hourly.nc
+
+If you need to, you can use the cimis.py script in the same folder as this netcdf file to download more data and suck it into the input file. Note Rusty had this happening automatically but I made it a bit more manual because of bugginess involved in the automation that would crash sfb_dfm.py
+
+d) To allow sfb_dfm.py to create the salinity and temperature initial condition, and to create a spatially varying secchidepth (for the heat model) we need data from the USGS Peterson Cruise. Check the following file to make sure it spans the simulation period:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/inputs-static/wqdata.csv
+
+If not, go to the following website: 
+    https://sfbay.wr.usgs.gov/water-quality-database/
+and download data starting from 15 days before the start date of the simulation through the end of the simulation. For a typical single water year simulation, that means downloading data for two calendar years spanning the water year. Multiple years of data need to be spliced together by hand. The spliced file should be named wqdata.csv. Upload this file to the following folder so sfb_dfm can find it:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/inputs-static/
+and make sure to change the permissions so sfb_dfm can read it:
+    cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/inputs-static/
+    chmod ugo+r wqdata.csv
+
+7) The wind and meteorological input need to be generated using repositories that live on SFEI's Google Drive. You can either ask Allie to do this (it takes her all of 5 minutes to launch the scripts), or you can try to generate them yourself. To generate them yourself, you either need to use a laptop running Google Drive for Desktop (formerly called Filestream) with the correct folders mounted, or you need to download the whole repository to your computer, and they are big, so you probably don't want to do that. Make sure these inputs are in the UTC time zone like the rest of the model
+
+Generate the wind inputs using the following repository:
+1_Nutrient_Share/9_Miscellaneous_Data/SFEI_Wind/ 
+(link: https://drive.google.com/drive/folders/1e0GGrld8uqjpnBkHCtsQK4-BVl9e1G3G?usp=share_link
+)
+Check the README.txt and Documentation folder to learn how this repo works, or skip ahead and just modify and run the python script
+    generate_amu_amv_4SFB_nearbay_stations_only.py 
+to generate the input files you need. The files are generated in the same folder as this script, and you can pick the name. If you end up with an empty file, you're going to need to download and process more wind data, and you will have to read about how to do that in the documentation folder. Note we used to use the file generate_amu_amv_4SFB.py, which used wind from 52 stations around the bay, but in summer 2024 we switched to generate_amu_amv_4SFB_nearbay_stations_only.py which excludes stations that are far from the bay and uses nearest neighbor interpolation instead of linear or natural neighbor, for simplicity. this switch was motivated by improvement of temperature predictions but we did not really properly test whether it improves things, because it was coupled with other changes. nevertheless, it seems like a better idea to only use nearby wind stations and to use a simpler form of interpolation.
+
+8) Generate the meteorological inputs using the following repository:
+1_Nutrient_Share/9_Miscellaneous_Data/SFEI_Meteo/
+(link: https://drive.google.com/drive/folders/1vph_vQT1CL5BlgomudxDm-58BNfksLQZ?usp=sharing
+)
+Use the script 
+    generate_hac_4SFB_curvilinear_station_data_based.py 
+to generate the hac.tem input file (the meteorological forcing). This script replaces the original air temperature (which was from all 52 wind stations) with air temperatures at NDBC stations only (which are on the water). Also replace relative humidity from the gridmet dataset with relative humidity from a set of CIMIS and ASOS stations that are not on the water but are closest to the water. Finally use CIMIS measurements of shortwave radiation to compute cloudiness instead of the daily gridMET dataset, taking care to line up the daily curves in time since sometimes an offset creates crazy cloudiness values. Use simple nearest neighbor interpolation for all three parameters. The data that feeds into this script is all in the SFEI_Wind repository. Note we updated our meteorological forcing in summer 2024, and this drastically improves the temperature predictions in our model. The old approach used air temperatures from all 52 wind stations, and used the gridMET dataset to estimate cloudiness and relative humidity. 
+
+9) Upload the wind and meteorological forcing files to the following location:
+    /run_path/run_folder/runs/run_name/bc_files/
+e.g. in our example, you would upload them into this folder:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/bc_files/
+and make sure to rename them as follows:
+    hac.tem = meteorological forcing
+    windx.amu = wind forcing, east component
+    windy.amv = wind forcing, north component
+
+10) from the linux command line, make sure to change permissions so DFM can read the meteo and wind files, e.g.
+    cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/
+    chmod -R ugo+r *
+
+Now we are done with the manual inputs, and we can start the automatic part of the run setup. First, you need to run the python script sfb_dfm.py. This will generate all the remaining input files for your DFlow3D-FM (DFM) run. Next, you need to run DFM on these input files. Finally, if you are planning to use the results of the simulation to run a DWAQ simulation, you are going to need to do two postprocessing steps: first the DWAQ hydro files from the 16 domains in the parallel simulation need to be stitched together, and second, if you are using the old version of the code (r52184-opt), the flow rates coming out of the point sources need to be corrected because this version of DFM leaves them out of the DWAQ hydro files. We have created a series of shell scripts that do all of this for you, but they are very specific to SFEI's servers. If you want to run the model outside SFEI, you will need to find your own way of running sfb_dfm.py, running DFM on your input files, and doing the two postprocessing steps. If you use a newer version of DFM you will not need to correct the point sources, but it doesn't hurt to do that anyway.
 
 Here is how you finally run the model at SFEI: 
 
-There are a series of shell scripts you need to execute in sequence. If you are not planning to use the hydrodynamic model output for DWAQ input you do not need to run step 3 or 4
+There are a series of shell scripts you need to execute in sequence. If you are not planning to use the hydrodynamic model output for DWAQ input you do not need to run step 3 or 4.
 
-run_launcher_part0.sh is where you define all the file paths, and the variables defined there are used as input to all the other shell scripts. You will need to edit this script for your run.
+All of these \*.sh files should be run in a bash shell.
 
-run_launcher_part1.sh calls sfb_dfm.py to create all the model input files
+11) run_launcher_part0.sh is where you define all the file paths, and the variables defined there are used as input to all the other shell scripts. You will need to edit this script for your run. Make sure that RUN_NAME matches the folder you created in “runs”, e.g., wy2021a in our example.
 
-***Note: if you are using the older version of the code, you will now need to delete the secchidepth input from the .ext file because this version does not accept secchidepth as an input!!! Otherwise your run will crash***
+12) run_launcher_part1.sh calls sfb_dfm.py to create all the model input files. Run this script. Then take a moment to look around at the files created by sfb_dfm.py. In our example they are:
 
-run_launcher_part2.sh partitions the domain and actually runs the DFM solver. There are some debugging options within this script. To find problems with the model input files, it works better to run in serial, without partitions.
+the main model settings control file, which is just a text file you can edit:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/wy2021a.mdu
 
-run_launcher_part3.sh stitches together the DWAQ input files, which are split across the multidomains used to parallelize the code
+the external forcing control file, which points to all the other external forcings, also a text file:
+    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/FlowFMold_bnd.ext
+Follow the paths in the \*.mdu and \*.ext files to find the other files that were generated.
 
-run_launcher_part4.sh makes a correction to the DWAQ input files, needed becasue the discharges from the point sources are missing (this error is corrected in newer versions of DFM), and also creates a set of DWAQ input files with temperature and salinity capped at maximum values that are specified in run_launcher_part0.sh
+If you are running the "old" version of DFM (r52184-opt) you will need to delete the secchidepth parameter from FlowFMold_bnd.ext, as this parameter is not recognized in the earlier version of the code, and it will crash your simulation. Edit the FlowFMold_bnd.ext file inside the run folder to delete the block of text about secchidepth. But you are probably running a newer version of the code that recognizes secchidepth.
 
-Finally, to create the aggregated grid hydro input for DWAQ, you can run aggregate_hydro.sh 
+13) run_launcher_part2.sh partitions the domain and actually runs the DFM solver. I recommend changing “debug” to “True” the first time you run run_launcher_part2.sh. This will run the code in serial, and if there are any error messages, you can find them in out.txt or err.txt. Once you have the code working in serial, launch it with debug=False. In this mode, the run launcher will partition the domain into 16 multidomains and run in parallel. The reason I recommend doing it this way is just that the error messages are better for the serial run. 
 
-Optionally, run postprocess_dwaq_binaries_to_netcdf.py to convert the 30 min DWAQ output to something like a map file. You'll need to break the output into short chunks of time, around one month, or server memory will be overloaded and script will crash. Sometimes it crashes anyway and you have to redo it
+14) run_launcher_part3.sh stitches together the DWAQ input files, which are split across the multidomains used to parallelize the code
 
-See Allie's notes about setting up the delft_env anaconda environment here: 
-https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/edit#bookmark=id.j7qlzh3zbl0h)
+15) run_launcher_part4.sh makes a correction to the DWAQ input files, needed because the discharges from the point sources are missing (this error is corrected in newer versions of DFM), and also creates a set of DWAQ input files with temperature and salinity capped at maximum values that are specified in run_launcher_part0.sh
+
+16) Finally, to create the aggregated grid hydro input for DWAQ, you can run aggregate_hydro.sh 
+
+17) Optionally, run postprocess_dwaq_binaries_to_netcdf.py to convert the 30 min DWAQ output to something like a map file. You'll need to break the output into short chunks of time, around one month, or server memory will be overloaded and the script will crash. Sometimes it crashes anyway and you have to redo it
 
 You can run validation scripts that are found here:
-	https://github.com/sfei/hydro_model_validation_2025.git
+    https://github.com/sfei/hydro_model_validation_2025.git
 
 And you may want to aggregate the DWAQ hydro input for use in our fast-running tidally averaged spatially aggregated model. You can find Emma's instructions for doing that here:
     https://docs.google.com/document/d/1KuEs-xHRl-SESOA22cQg1Vkew8vzz5z-ymel3HoBLck/edit#bookmark=id.qnvhwvw92e47
 and/or you can borrow and modify the aggregate_hydro.sh script that is included in the sfb_dfm repository to do the job
-
 
 
 

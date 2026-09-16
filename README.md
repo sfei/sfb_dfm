@@ -51,19 +51,19 @@ for example, for the wy2021-v24 run, on boise, we created the following director
 
 /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
 
-3) Clone sfb_dfm from https://github.com/sfei/sfb_dfm.git into this folder, e.g.
+2) Clone sfb_dfm from https://github.com/sfei/sfb_dfm.git into this folder, e.g.
 
 cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
 
 git clone https://github.com/sfei/sfb_dfm.git
 
-6) Clone stompy into the same folder:
+3) Clone stompy into the same folder:
 
 cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
 
 git clone https://github.com/rustychris/stompy
 
-9) Create a folder called "runs" in this same folder, and then create a folder with the name of the run inside that folder, and make a folder called "bc_files" inside that one, e.g., if your run name is "wy2021a" do this:
+4) Create a folder called "runs" in this same folder, and then create a folder with the name of the run inside that folder, and make a folder called "bc_files" inside that one, e.g., if your run name is "wy2021a" do this:
 
 cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
 
@@ -85,7 +85,7 @@ so now you have the following directories in our example:
 
 /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/bc_files/
 
-11) now navigate inside the sfb_dfm folder and clone the two repositories that contain freshwater inputs from the tributaries and the POTWs, respectively, e.g.,
+5) now navigate inside the sfb_dfm folder and clone the two repositories that contain freshwater inputs from the tributaries and the POTWs, respectively, e.g.,
 
 cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/
 
@@ -93,7 +93,7 @@ git clone https://github.com/sfei/sfbay_freshwater.git
 
 git clone https://github.com/sfei/sfbay_potw.git
         
-13) Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period. You need to check three things, to start:
+6) Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period. You need to check three things, to start:
 
 a) Check the freshwater inflows file to make sure there are data during the simulation period, e.g.
 
@@ -164,7 +164,7 @@ generate_hac_4SFB_curvilinear_station_data_based.py
 
 to generate the hac.tem input file (the meteorological forcing). This script replaces the original air temperature (which was from all 52 wind stations) with air temperatures at NDBC stations only (which are on the water). Also replace relative humidity from the gridmet dataset with relative humidity from a set of CIMIS and ASOS stations that are not on the water but are closest to the water. Finally use CIMIS measurements of shortwave radiation to compute cloudiness instead of the daily gridMET dataset, taking care to line up the daily curves in time since sometimes an offset creates crazy cloudiness values. Use simple nearest neighbor interpolation for all three parameters. The data that feeds into this script is all in the SFEI_Wind repository. Note we updated our meteorological forcing in summer 2024, and this drastically improves the temperature predictions in our model. The old approach used air temperatures from all 52 wind stations, and used the gridMET dataset to estimate cloudiness and relative humidity. 
 
-11) Upload the wind and meteorological forcing files to the following location:
+9) Upload the wind and meteorological forcing files to the following location:
 
 /run_path/run_folder/runs/run_name/bc_files/
 
@@ -180,7 +180,7 @@ windx.amu = wind forcing, east component
 
 windy.amv = wind forcing, north component
 
-14) from the linux command line, make sure to change permissions so DFM can read the meteo and wind files, e.g.
+10) from the linux command line, make sure to change permissions so DFM can read the meteo and wind files, e.g.
 
 cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/
 

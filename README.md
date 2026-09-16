@@ -3,14 +3,14 @@ Last updated by Allie King Sept. 16, 2026
 These scripts set up and run the hydrodynamic solver, DFM, for the SFEI Open Bay model. Much of the setup is automatic! The parts Rusty wrote are totally automatic. The parts Allie wrote require a little more babysitting on the part of the user, but hopefully not too much.
 
 The sfb_dfm repo has been migrated to SFEI's github page and is now found here:
-    https://github.com/sfei/sfb_dfm.git
+	https://github.com/sfei/sfb_dfm.git
 along with its two submodules:
-    https://github.com/sfei/sfbay_freshwater.git 
-    https://github.com/sfei/sfbay_potw.git
+	https://github.com/sfei/sfbay_freshwater.git 
+	https://github.com/sfei/sfbay_potw.git
 You can find the "original" sfb_dfm and the original three submodules sfb_dfm_utils, sfbay_freshwater, and sfbay_potw in Rusty Holleman's github account
-    https://github.com/rustychris/
+	https://github.com/rustychris/
 Rusty's version was used to run the original wy2013 simulation. Emma Nuss made some changes, including updating the POTW flows through 2019, and her version is in her github account:
-    https://github.com/emmashie/
+	https://github.com/emmashie/
 Note that in Rusty and Emma’s versions, sfb_dfm_utils was a separate module, but now it has been sucked into the main sfb_dfm repository.
 
 Directions for accessing github from the SFEI servers can be found here: https://docs.google.com/document/d/1HTvA5CZEFIRTJ8Wd2Bk1P5C9OulmB7pstvo8044oSFI/edit?tab=t.0#bookmark=id.668rmjerjylf
@@ -21,24 +21,24 @@ https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/
 
 Steps for setting up an open bay hydro simulation:
 
-1) Create a folder for the run, e.g., run_folder located at 
-    /run_path/run_folder/
+1) Create a folder for the run, e.g., run_folder located at
+	/run_path/run_folder/
 We have been storing our more recent runs in these "run_path" on the new servers:
-    /chicagovol2/hpcshared/open_bay/hydro/full_res/
-    /boisevol2/hpcshared/open_bay/hydro/full_res/
-    /fortcollinsvol2/hpcshared/open_bay/hydro/full_res/
+	/chicagovol2/hpcshared/open_bay/hydro/full_res/
+	/boisevol2/hpcshared/open_bay/hydro/full_res/
+	/fortcollinsvol2/hpcshared/open_bay/hydro/full_res/
 for example, for the wy2021-v24 run, on boise, we created the following directory:
-    /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
+	/boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
 
-2) Clone sfb_dfm from https://github.com/sfei/sfb_dfm.git into this folder, e.g.
+3) Clone sfb_dfm from https://github.com/sfei/sfb_dfm.git into this folder, e.g.
     cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
     git clone https://github.com/sfei/sfb_dfm.git
 
-3) Clone stompy into the same folder:
+4) Clone stompy into the same folder:
     cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
     git clone https://github.com/rustychris/stompy
 
-4) Create a folder called "runs" in this same folder, and then create a folder with the name of the run inside that folder, and make a folder called "bc_files" inside that one, e.g., if your run name is "wy2021a" do this:
+5) Create a folder called "runs" in this same folder, and then create a folder with the name of the run inside that folder, and make a folder called "bc_files" inside that one, e.g., if your run name is "wy2021a" do this:
     cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/
     mkdir runs
     cd runs
@@ -49,12 +49,12 @@ so now you have the following directories in our example:
     /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/
     /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/stompy/
     /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/bc_files/
-5) now navigate inside the sfb_dfm folder and clone the two repositories that contain freshwater inputs from the tributaries and the POTWs, respectively, e.g., 
+6) now navigate inside the sfb_dfm folder and clone the two repositories that contain freshwater inputs from the tributaries and the POTWs, respectively, e.g., 
     cd /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/
     git clone https://github.com/sfei/sfbay_freshwater.git
     git clone https://github.com/sfei/sfbay_potw.git
         
-6) Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period. You need to check three things, to start:
+7) Now you have most of the pieces in place to set up the run. You should take a moment to check that the input files inside all these repositories have data during your intended simulation period. You need to check three things, to start:
 
 a) Check the freshwater inflows file to make sure there are data during the simulation period, e.g.
     /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/sfb_dfm/sfbay_freshwater/outputs/sfbay_freshwater.nc

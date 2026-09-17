@@ -206,7 +206,9 @@ the external forcing control file, which points to all the other external forcin
 
 /boisevol2/hpcshared/open_bay/hydro/full_res/wy2021-v24/runs/wy2021a/FlowFMold_bnd.ext
 
-Follow the paths in the \*.mdu and \*.ext files to find the other files that were generated.
+Follow the paths in the \*.mdu and \*.ext files to see the names of the other files that were generated.
+
+Look in the folder bc_figures_compiled to find a PDF with time series plots for all of the boundary conditions that are represented as time series. Make sure everything looks about right.
 
 If you are running the "old" version of DFM (r52184-opt) you will need to delete the secchidepth parameter from FlowFMold_bnd.ext, as this parameter is not recognized in the earlier version of the code, and it will crash your simulation. Edit the FlowFMold_bnd.ext file inside the run folder to delete the block of text about secchidepth. But you are probably running a newer version of the code that recognizes secchidepth.
 

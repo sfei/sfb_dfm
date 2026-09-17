@@ -141,7 +141,7 @@ mdu['external forcing','ExtForceFile'] = old_bc_name
 # is also modified to deepen areas near inflows, before being written
 # out near the end of the script
 #grid = dfm_grid.DFMGrid(str(net_file)) 
-grid = unstructured_grid.UnstructuredGrid.read_dfm(str(net_file)) # alliek update to ugrid august 2024
+grid = unstructured_grid.UnstructuredGrid.read_dfm(str(net_file_name)) # alliek update to ugrid august 2024
     
 ## split into relative and absolute directories (alliek Dec 2020)
 rel_bc_dir = 'bc_files'

@@ -31,7 +31,7 @@ https://docs.google.com/document/d/1CzJB8GERYrL7ppf_n1s3Hmggqkb1deBmSu-8Xp5yRiY/
 
 You will need a compatible anaconda environment for running the python scripts that set up the run. See notes about setting up the delft_env anaconda environment here: 
 
-https://docs.google.com/document/d/1M0UWPWKEOPgyxB8YBiivAog91cmQ6KhljN9fR8WRQ2Y/edit#bookmark=id.j7qlzh3zbl0h)
+https://docs.google.com/document/d/1c8cv44R6z_1Cqyma5viHxE0fp-uS6-G3VBkjbcS9Yxw/edit?usp=sharing
 
 Steps for setting up an open bay hydro simulation:
 

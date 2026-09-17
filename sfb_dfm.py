@@ -314,10 +314,7 @@ if 1: # output locations
     crs_source = os.path.join(abs_static_dir,crs_name)
     crs_dest = os.path.join(run_base_dir,crs_name)
     shutil.copyfile(crs_source,crs_dest)
-    mdu['geometry','FixedWeirFile'] = crs_name # modified 2/9/26 to fix levee issues
-
-
-    mdu['output','CrsFile'] = os.path.join(rel_static_dir, "SB-observationcrosssection.pli")
+    mdu['output','CrsFile'] = crs_name
 
 ##
 if 1:

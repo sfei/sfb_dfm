@@ -86,10 +86,13 @@ abs_init_dir = os.path.join(base_dir,'sfb_dfm_utils')
 
 # reference date - can only be specified to day precision, so # truncate to day precision (rounds down)
 ref_date = run_start.astype('datetime64[D]')
-net_file = os.path.join(base_dir, 'sfei_v25_straightened_net.nc') # updated 2/9/26 to fix levee issues
+
+# name of grid file
+net_file_name = 'sfei_v25_straightened_net.nc' # updated 2/9/26 to fix levee issues
 
 # No longer using any new-style boundary conditions
-old_bc_fn = os.path.join(run_base_dir ,'FlowFMold_bnd.ext')
+old_bc_name = 'FlowFMold_bnd.ext' 
+old_bc_fn = os.path.join(run_base_dir ,old_bc_name)
 obs_shp_fn = os.path.join(abs_static_dir ,'observation-points.shp')
 
 # path to grid boundary shapefile
@@ -121,13 +124,17 @@ if 1: # set dates
     mdu['time','TStart']  = 0
     mdu['time','TStop']   = int( (run_stop - run_start) / np.timedelta64(1,'m') )
 
-mdu['geometry','LandBoundaryFile'] = os.path.join(rel_static_dir, "deltabay.ldb")
+lbfile_name = "deltabay.ldb"
+lbfile_source = os.path.join(abs_static_dir,lbfile_name)
+lbfile_dest = os.path.join(run_base_dir,lbfile_name)
+shutil.copyfile(lbfile_source,lbfile_dest)
+mdu['geometry','LandBoundaryFile'] = lbfile_name
 
 mdu['geometry','Kmx'] = 10 # 10 layers
 
 # update location of the boundary conditions
 # this has the source/sinks which cannot be written in the new style file
-mdu['external forcing','ExtForceFile'] = old_bc_fn
+mdu['external forcing','ExtForceFile'] = old_bc_name
 
 #%%
 # Load the grid now -- it's used for clarifying some inputs, but
@@ -240,8 +247,12 @@ sfb_dfm_utils.add_ocean(run_base_dir,
 
 ## 
 if 1:            
+    friction_name = "friction12e.xyz"
+    friction_source = os.path.join(abs_static_dir,friction_name)
+    friction_dest = os.path.join(run_base_dir,friction_name)
+    shutil.copyfile(friction_source, friction_dest) 
     lines=["QUANTITY=frictioncoefficient",
-           "FILENAME=%s/friction12e.xyz" % rel_static_dir,
+           "FILENAME=%s" % friction_name,
            "FILETYPE=7",
            "METHOD=5",
            "OPERAND=O",
@@ -250,7 +261,11 @@ if 1:
         fp.write("\n".join(lines))
 
 if 1:  # Copy grid file into run directory and update mdu
-    mdu['geometry','NetFile'] = net_file
+
+    net_file_source = os.path.join(base_dir, net_file_name) 
+    net_file_dest = os.path.join(run_base_dir,net_file_name)
+    shutil.copyfile(net_file_source,net_file_dest)
+    mdu['geometry','NetFile'] = net_file_name
     
     # alliek commented out august 2024:
     #dest = os.path.join(run_base_dir, mdu['geometry','NetFile'])
@@ -279,7 +294,11 @@ sfb_dfm_utils.add_initial_salinity(run_base_dir,
 
 
 if 1: # fixed weir file is just referenced as static input
-    mdu['geometry','FixedWeirFile'] = os.path.join(rel_static_dir,'SBlevees_tdk_v25.pli') # modified 2/9/26 to fix levee issues
+    levee_file_name = "SBlevees_tdk_v25.pli"
+    levee_file_source = os.path.join(abs_static_dir,levee_file_name)
+    levee_file_dest = os.path.join(run_base_dir,levee_file_name)
+    shutil.copyfile(levee_file_source,levee_file_dest)
+    mdu['geometry','FixedWeirFile'] = levee_file_name # modified 2/9/26 to fix levee issues
 
 if 1: 
     # evaporation was a bit out of control in south bay - try scaling back just
@@ -291,6 +310,13 @@ if 1:
     sfb_dfm_utils.add_cimis_evap_precip(cimis_fn, run_base_dir, mdu, scale_precip=1.0, scale_evap=0.5)
     
 if 1: # output locations
+    crs_name = "SB-observationcrosssection.pli"
+    crs_source = os.path.join(abs_static_dir,crs_name)
+    crs_dest = os.path.join(run_base_dir,crs_name)
+    shutil.copyfile(crs_source,crs_dest)
+    mdu['geometry','FixedWeirFile'] = crs_name # modified 2/9/26 to fix levee issues
+
+
     mdu['output','CrsFile'] = os.path.join(rel_static_dir, "SB-observationcrosssection.pli")
 
 ##

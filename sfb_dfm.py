@@ -345,6 +345,18 @@ if 1:
     mdu['output','Wrishp_src']                        = 1      # Write shape file for sources
     mdu['output','Wrishp_pump']                       = 1      # Write shape file for pump
 
+if 1:
+
+    mdu['waves','Wavemodelnr'] = "1     # Wave model nr. (0: none, 1: fetch/depth limited hurdlestive, 2: Young-Verhagen, 3: SWAN, 5: uniform, 6: SWAN-NetCDF"
+    mdu['waves','Gammax'] = "0.6   # Maximum wave height/water depth ratio"
+    mdu['waves','uorbfac'] = "0     # Orbital velocities: 0=D3D style; 1=Guza style"
+    mdu['waves','jahissigwav'] = "1     # 1: sign wave height on his output; 0: hrms wave height on his output. Default=1."
+    mdu['waves','jamapsigwav'] = "1     # 1: sign wave height on map output; 0: hrms wave height on map output. Default=0 (legacy behaviour)."
+    mdu['waves','hminlw'] = "0.2   # Cut-off depth for application of wave forces in momentum balance"
+    mdu['waves','Tifetchcomp'] = "3600  # Time interval of recalculating fetch (taking water depth into account)"
+    mdu['waves','WaveSwartDelwaq'] = "1     # if WaveSwartDelwaq == 1 .and. Tiwaq > 0 then increase tauwave to Delwaq with ftauw*0.5rho*fw*uorbuorb"
+    mdu['waves','ftauw'] = "1     # Scaling parameter for wave induced bed shear stress"
+    mdu['waves','3Dwavebreakerturbulence'] = "0"
 
 # initialze a string to print at the end of this script
 user_instruction_string = ''
